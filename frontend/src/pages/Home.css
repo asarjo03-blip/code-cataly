@@ -1,0 +1,214 @@
+.landing {
+  min-height: 100vh;
+  min-height: 100dvh;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 1.25rem 1.25rem 2rem;
+  color: #fff;
+  overflow: hidden;
+  background: linear-gradient(180deg, #5eb3e0 0%, #7ec8ef 28%, #8fd0a0 58%, #4f9a4a 100%);
+}
+
+.landing__sky {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.landing__sun {
+  position: absolute;
+  top: 8%;
+  right: 14%;
+  width: 3.2rem;
+  height: 3.2rem;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #ffe9a8, #f5c542);
+  box-shadow: 0 0 40px rgba(255, 220, 120, 0.55);
+  animation: floaty 6s ease-in-out infinite;
+}
+
+.landing__cloud {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 999px;
+  filter: blur(0.5px);
+}
+
+.landing__cloud--1 {
+  top: 12%;
+  left: 8%;
+  width: 4.5rem;
+  height: 1.4rem;
+  animation: drift 12s linear infinite;
+}
+
+.landing__cloud--2 {
+  top: 18%;
+  left: 42%;
+  width: 3.2rem;
+  height: 1.1rem;
+  animation: drift 16s linear infinite reverse;
+}
+
+.landing__mountain {
+  position: absolute;
+  left: -10%;
+  right: -10%;
+  bottom: 38%;
+  height: 28%;
+  background: linear-gradient(180deg, #6aa86a, #3f7d45);
+  clip-path: polygon(0 70%, 18% 35%, 34% 55%, 52% 20%, 70% 48%, 86% 28%, 100% 60%, 100% 100%, 0 100%);
+}
+
+.landing__field {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 42%;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.06) 0 12px,
+      transparent 12px 28px
+    ),
+    linear-gradient(180deg, #6bb85a 0%, #3f8f3c 55%, #2f6f2f 100%);
+}
+
+.landing__tractor,
+.landing__farmer,
+.landing__cow {
+  position: absolute;
+  font-size: 2.4rem;
+  filter: drop-shadow(0 8px 10px rgba(0, 0, 0, 0.18));
+}
+
+.landing__tractor {
+  bottom: 26%;
+  left: 12%;
+  animation: bounce 3.5s ease-in-out infinite;
+}
+
+.landing__farmer {
+  bottom: 22%;
+  right: 18%;
+  font-size: 3rem;
+  animation: floaty 4.5s ease-in-out infinite;
+}
+
+.landing__cow {
+  bottom: 20%;
+  left: 42%;
+  font-size: 2rem;
+}
+
+.landing__top {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: auto;
+  padding-top: 0.5rem;
+}
+
+.landing__brand {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 700;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+}
+
+.landing__copy {
+  position: relative;
+  z-index: 2;
+  max-width: 28rem;
+}
+
+.landing__copy h1 {
+  font-family: var(--font-display);
+  font-size: clamp(1.85rem, 6vw, 2.55rem);
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  text-shadow: 0 3px 18px rgba(0, 0, 0, 0.25);
+}
+
+.landing__copy > p {
+  margin-top: 0.85rem;
+  font-size: var(--text-sm);
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.92);
+  max-width: 26rem;
+}
+
+.landing__features {
+  margin-top: 1.25rem;
+  display: grid;
+  gap: 0.65rem;
+}
+
+.landing__features li {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-weight: 600;
+  font-size: var(--text-sm);
+}
+
+.landing__actions {
+  position: relative;
+  z-index: 2;
+  margin-top: 1.75rem;
+  display: grid;
+  gap: 0.85rem;
+  max-width: 28rem;
+}
+
+.landing__signin {
+  text-align: center;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@keyframes floaty {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(10px);
+  }
+}
+
+@keyframes drift {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(40px);
+  }
+}
+
+@media (min-width: 768px) {
+  .landing {
+    padding: 2rem 3rem 2.5rem;
+  }
+
+  .landing__copy,
+  .landing__actions {
+    max-width: 34rem;
+  }
+}

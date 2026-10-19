@@ -1,0 +1,68 @@
+.calendar-page__now {
+  margin: 1rem 0;
+  font-size: var(--text-sm);
+  color: var(--color-ink-muted);
+}
+
+.calendar-timeline {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.cal-card {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: 1rem;
+  box-shadow: var(--shadow-soft);
+  border: 1.5px solid transparent;
+}
+
+.cal-card.is-current {
+  border-color: var(--color-primary);
+  background: var(--color-primary-soft);
+}
+
+.cal-card__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cal-card__head h3 {
+  font-size: var(--text-md);
+}
+
+.cal-card__months {
+  margin: 0.35rem 0 0.45rem;
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-primary-dark);
+}
+
+.cal-card p {
+  font-size: var(--text-sm);
+  color: var(--color-ink-soft);
+}
+
+.cal-card__bar {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 3px;
+  margin-top: 0.85rem;
+}
+
+.cal-seg {
+  height: 8px;
+  border-radius: 99px;
+  background: var(--color-border);
+}
+
+.cal-seg.is-on {
+  background: var(--color-primary);
+}
+
+.cal-seg.is-today {
+  outline: 2px solid var(--color-cta);
+  outline-offset: 1px;
+}

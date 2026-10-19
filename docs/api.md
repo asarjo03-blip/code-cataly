@@ -38,3 +38,45 @@ Regions: `banjul`, `kanifing`, `west_coast`, `north_bank`, `lower_river`, `centr
 ## Dashboard
 
 `GET /dashboard` — user summary, season, weather, alerts, top advice, and tracked crops.
+
+## Marketplace
+
+Marketplace records are stored in MongoDB and shared between users. Listing and buy-request creation use the authenticated user's profile for the public contact name and phone; those identity fields are not accepted from the request body.
+
+### Produce listings
+
+- `GET /listings` — open listings. Optional query: `crop`, `region`, `q`, `minPrice`, `maxPrice`, `minQty`.
+- `GET /listings/:id` — one open listing.
+- `GET /listings/mine` — the signed-in farmer's listings, including closed listings (`farmer`, `admin`).
+- `POST /listings` — create a listing (`farmer`, `admin`). Body: `crop`, `quantity`, `askingPrice`, `region`, and optional `unit`, `village`, `availableFrom`, `notes`, `image`.
+- `PATCH /listings/:id` — update your own listing (`farmer`, `admin`).
+- `DELETE /listings/:id` — delete your own listing (`farmer`, `admin`).
+
+### Buyer requests
+
+- `GET /buy-requests` — open buyer requests. Optional query: `crop`, `region`.
+- `GET /buy-requests/mine` — the signed-in buyer's requests (`vendor`, `admin`).
+- `POST /buy-requests` — create a buy request (`vendor`, `admin`). Body: `crop`, `quantity`, `offerPrice`, `region`, and optional `unit`, `neededBy`, `notes`.
+
+Both marketplace collections return `{ "success": true, "data": [...] }` for list endpoints. Individual records use the same envelope with one object in `data`.
+
+## Markets and prices
+
+- `GET /markets` — list seeded Gambian markets. Optional query: `region`.
+- `GET /markets/:id` — market details.
+- `GET /markets/prices` — latest prices by crop and market. Optional query: `crop`, `marketId`, `region`.
+- `GET /markets/compare?crop=groundnut` — latest prices and best-price market for one crop.
+- `GET /markets/history?crop=groundnut&marketId=farafenni` — last seven recorded prices.
+- `POST /markets/prices` — record a price (`admin`, `extension_officer`). Body: `crop`, `marketId`, `pricePerKg`, optional `note`. A submitted price is stored with its previous value to calculate the trend.
+
+## Advisories and alerts
+
+- `GET /advisories` — published advice. Optional query: `crop`, `category`, `q`.
+- `GET /advisories/:id` — one published advisory.
+- `POST /advisories` — publish advice (`admin`, `extension_officer`). Body: `title`, `category`, `summary`, `body`, optional `crop`, `language`.
+- `GET /alerts` — current published alerts. Optional query: `region`.
+- `POST /alerts` — publish an alert (`admin`, `extension_officer`). Body: `type`, `severity`, `region`, `title`, `message`.
+
+Run `npm run seed` to seed the demo markets, seven-day sample price histories, and advisories alongside demo users and marketplace records.
+
+When the API cannot be reached, the frontend falls back to browser-local sample marketplace data and shows an offline-demo banner. Writes made in this mode are stored only in that browser and are not uploaded automatically when the server returns.

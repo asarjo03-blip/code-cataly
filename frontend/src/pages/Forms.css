@@ -1,0 +1,69 @@
+.form-card {
+  background: var(--color-surface);
+  border-radius: var(--radius-xl);
+  padding: 1.15rem;
+  box-shadow: var(--shadow-soft);
+  margin-bottom: 1.25rem;
+}
+
+.form-card h2 {
+  font-size: var(--text-lg);
+  margin-bottom: 0.85rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.form-page__toast {
+  background: var(--color-success-soft);
+  color: var(--color-primary-dark);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.85rem;
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.list-stack {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.list-item {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: 0.95rem 1rem;
+  box-shadow: var(--shadow-soft);
+  display: grid;
+  gap: 0.65rem;
+}
+
+.list-item h3 {
+  font-size: var(--text-sm);
+}
+
+.list-item p {
+  margin-top: 0.25rem;
+  font-size: var(--text-xs);
+  color: var(--color-ink-muted);
+}
+
+.list-item__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.list-item__actions a,
+.list-item__actions button {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-primary-dark);
+}
+
+.list-item__actions .danger {
+  color: var(--color-accent);
+}

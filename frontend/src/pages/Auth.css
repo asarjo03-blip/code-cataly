@@ -1,0 +1,66 @@
+.auth-page {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+  background:
+    radial-gradient(circle at top left, rgba(61, 159, 214, 0.25), transparent 45%),
+    radial-gradient(circle at bottom right, rgba(31, 154, 82, 0.2), transparent 40%),
+    var(--color-bg);
+}
+
+.auth-page__panel {
+  width: min(100%, 26rem);
+  background: var(--color-surface);
+  border-radius: var(--radius-xl);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-soft);
+}
+
+.auth-page--wide .auth-page__panel {
+  width: min(100%, 32rem);
+}
+
+.auth-page__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+}
+
+.auth-page__brand {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--color-primary-dark);
+}
+
+.auth-page h1 {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  margin-bottom: 0.35rem;
+}
+
+.auth-page__hint {
+  color: var(--color-ink-muted);
+  font-size: var(--text-xs);
+  margin-bottom: 1.25rem;
+}
+
+.auth-page__switch {
+  margin-top: 1.25rem;
+  text-align: center;
+  font-size: var(--text-sm);
+  color: var(--color-ink-muted);
+}
+
+.auth-page__switch a {
+  color: var(--color-primary-dark);
+  font-weight: 700;
+}
+
+.role-pills {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}

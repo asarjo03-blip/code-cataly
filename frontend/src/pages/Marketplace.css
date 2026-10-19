@@ -1,0 +1,115 @@
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: var(--tap);
+  padding: 0 1rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  box-shadow: var(--shadow-soft);
+}
+
+.search-bar input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  min-height: 2.6rem;
+}
+
+.promo-row {
+  display: flex;
+  gap: 0.75rem;
+  overflow-x: auto;
+  margin: 1rem 0 0.25rem;
+  padding-bottom: 0.35rem;
+  scrollbar-width: none;
+}
+
+.promo-row::-webkit-scrollbar {
+  display: none;
+}
+
+.promo-card {
+  flex: 0 0 72%;
+  max-width: 16rem;
+  min-height: 7.5rem;
+  padding: 1rem;
+  border-radius: var(--radius-xl);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  box-shadow: var(--shadow-soft);
+}
+
+.promo-card h3 {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+}
+
+.promo-card p {
+  margin-top: 0.25rem;
+  font-size: var(--text-xs);
+  opacity: 0.92;
+}
+
+.promo-card--blue {
+  background: linear-gradient(145deg, #1f6fa0, #5eb3e0);
+}
+
+.promo-card--green {
+  background: linear-gradient(145deg, #167a40, #3cb86a);
+}
+
+.promo-card--amber {
+  background: linear-gradient(145deg, #b56a10, #e0a44a);
+}
+
+.filters-row {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 0.55rem;
+  margin-top: 0.85rem;
+}
+
+.filters-row select,
+.filters-row input {
+  min-height: 2.6rem;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--color-border);
+  background: var(--color-surface);
+  padding: 0 0.85rem;
+}
+
+.produce-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+}
+
+.marketplace-note {
+  margin-top: 1rem;
+  font-size: var(--text-sm);
+}
+
+.marketplace-note a {
+  color: var(--color-primary-dark);
+  font-weight: 700;
+}
+
+.marketplace-note.muted {
+  color: var(--color-ink-muted);
+  font-size: var(--text-xs);
+}
+
+@media (min-width: 768px) {
+  .promo-card {
+    flex-basis: 14rem;
+  }
+
+  .produce-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

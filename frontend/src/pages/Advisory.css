@@ -1,0 +1,64 @@
+.advisory-list {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.advisory-card {
+  display: block;
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: 1rem;
+  box-shadow: var(--shadow-soft);
+}
+
+.advisory-card h3 {
+  margin: 0.55rem 0 0.35rem;
+  font-size: var(--text-md);
+}
+
+.advisory-card p {
+  font-size: var(--text-sm);
+  color: var(--color-ink-soft);
+}
+
+.advisory-card small {
+  display: inline-block;
+  margin-top: 0.55rem;
+  color: var(--color-primary-dark);
+  font-weight: 600;
+  font-size: var(--text-xs);
+}
+
+.advisory-detail__back {
+  display: inline-block;
+  margin-bottom: 1rem;
+  font-weight: 700;
+  color: var(--color-primary-dark);
+}
+
+.advisory-detail h1 {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  margin: 0.65rem 0 0.35rem;
+  letter-spacing: -0.02em;
+}
+
+.advisory-detail__meta {
+  color: var(--color-ink-muted);
+  font-size: var(--text-sm);
+}
+
+.advisory-detail__summary {
+  margin: 1rem 0;
+  font-weight: 600;
+  color: var(--color-ink-soft);
+}
+
+.advisory-detail__body {
+  display: grid;
+  gap: 0.85rem;
+  font-size: var(--text-md);
+  line-height: 1.6;
+  color: var(--color-ink-soft);
+}

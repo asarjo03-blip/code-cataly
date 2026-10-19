@@ -1,0 +1,14 @@
+.price-chart {
+  width: 100%;
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: 0.75rem 0.5rem 0.25rem;
+  box-shadow: var(--shadow-soft);
+}
+
+.price-chart__empty {
+  padding: 1.5rem;
+  text-align: center;
+  color: var(--color-ink-muted);
+  font-size: var(--text-sm);
+}

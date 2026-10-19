@@ -22,8 +22,14 @@ export function validate(schema) {
       if (rule.type === 'string' && typeof value !== 'string') {
         errors.push(`${field} must be a string`);
       }
-      if (rule.type === 'number' && typeof value !== 'number' && Number.isNaN(Number(value))) {
+      if (rule.type === 'number' && Number.isNaN(Number(value))) {
         errors.push(`${field} must be a number`);
+      }
+      if (rule.type === 'number' && rule.min != null && Number(value) < rule.min) {
+        errors.push(`${field} must be at least ${rule.min}`);
+      }
+      if (rule.type === 'number' && rule.max != null && Number(value) > rule.max) {
+        errors.push(`${field} must be at most ${rule.max}`);
       }
       if (rule.type === 'array' && !Array.isArray(value)) {
         errors.push(`${field} must be an array`);

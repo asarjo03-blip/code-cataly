@@ -1,0 +1,47 @@
+.profile-hero {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.profile-hero__avatar {
+  width: 3.4rem;
+  height: 3.4rem;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 1.35rem;
+}
+
+.profile-hero h2 {
+  font-size: var(--text-lg);
+}
+
+.profile-hero p {
+  color: var(--color-ink-muted);
+  font-size: var(--text-sm);
+}
+
+.profile-links {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.55rem;
+  margin-bottom: 1rem;
+}
+
+.profile-links a {
+  min-height: var(--tap);
+  display: grid;
+  place-items: center;
+  padding: 0.65rem;
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  font-size: var(--text-sm);
+  font-weight: 700;
+}

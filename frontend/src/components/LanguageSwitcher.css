@@ -1,0 +1,17 @@
+.lang-switch select {
+  min-height: 2.25rem;
+  padding: 0.35rem 0.7rem;
+  border-radius: var(--radius-pill);
+  border: 1.5px solid rgba(255, 255, 255, 0.45);
+  background: rgba(255, 255, 255, 0.18);
+  color: inherit;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  backdrop-filter: blur(8px);
+}
+
+.lang-switch--compact select {
+  border-color: var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-ink);
+}

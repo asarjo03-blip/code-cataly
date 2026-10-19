@@ -19,3 +19,7 @@ Demo accounts (password `Password123`):
 - `admin@agriconnect.gm`
 
 See `docs/api.md` for the HTTP API.
+
+The marketplace uses real, crop-matched photos served by the Pexels image CDN, so product photos require an internet connection.
+
+If the API server cannot be reached, the frontend automatically switches supported marketplace, market-price, advisory, alert, and dashboard reads to sample data. A banner labels this offline demo mode. Changes made while offline stay in that browser's local storage and are not synchronized with the server.

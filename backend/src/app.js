@@ -10,6 +10,10 @@ import authRoutes from './routes/authRoutes.js';
 import dashboardRoutes from './routes/dashboardRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import weatherRoutes from './routes/weatherRoutes.js';
+import { buyRequestRouter, listingRouter } from './routes/listingRoutes.js';
+import advisoryRoutes from './routes/advisoryRoutes.js';
+import alertRoutes from './routes/alertRoutes.js';
+import marketRoutes from './routes/marketRoutes.js';
 
 const app = express();
 
@@ -31,6 +35,11 @@ app.use('/api/users', userRoutes);
 app.use('/api/weather', weatherRoutes);
 app.use('/api/advice', adviceRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/listings', listingRouter);
+app.use('/api/buy-requests', buyRequestRouter);
+app.use('/api/markets', marketRoutes);
+app.use('/api/advisories', advisoryRoutes);
+app.use('/api/alerts', alertRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
