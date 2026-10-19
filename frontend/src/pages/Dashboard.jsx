@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import AlertBanner from '../components/AlertBanner.jsx';
 import Loader, { Skeleton } from '../components/Loader.jsx';
+import { weatherIconFor } from '../components/Icons.jsx';
 import TopBar from '../components/TopBar.jsx';
-import { alertApi, buyRequestApi, dashboardApi, marketApi } from '../api/services.js';
+import { dashboardApi } from '../api/services.js';
 import { getErrorMessage } from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
@@ -25,23 +26,12 @@ export default function Dashboard() {
     async function load() {
       setLoading(true);
       try {
-        const [dash, priceRes, requestRes, alertRes] = await Promise.all([
-          dashboardApi.get(),
-          marketApi.prices({}),
-          buyRequestApi.list(),
-          alertApi.list({ region: user?.region }),
-        ]);
+        const dash = await dashboardApi.get();
         if (!active) return;
         setData(dash.data);
-        const cropSet = new Set(user?.crops || []);
-        const mine = (priceRes.data || []).filter((p) => cropSet.has(p.crop));
-        setPrices(mine.length ? mine : priceRes.data.slice(0, 4));
-        setMatches(
-          requestRes.data
-            .filter((request) => cropSet.has(request.crop) && (!user?.region || request.region === user.region))
-            .slice(0, 3),
-        );
-        setManagedAlerts(alertRes.data);
+        setPrices(dash.data?.prices || []);
+        setMatches(dash.data?.matches || []);
+        setManagedAlerts(dash.data?.alerts || []);
       } catch (err) {
         if (active) setError(getErrorMessage(err, 'Could not load dashboard'));
       } finally {
@@ -75,6 +65,7 @@ export default function Dashboard() {
         message: a.body,
       })),
   ];
+  const farmerView = user?.role === 'farmer';
 
   return (
     <div className="dashboard">
@@ -106,7 +97,10 @@ export default function Dashboard() {
               </p>
             </div>
             <span className="dash-weather__icon" aria-hidden="true">
-              {(weather.rainMm || 0) > 2 ? '🌧' : '☀️'}
+              {(() => {
+                const Icon = weatherIconFor(weather.code, weather.rainMm);
+                return <Icon size={48} />;
+              })()}
             </span>
           </div>
           <div className="dash-weather__forecast">
@@ -169,7 +163,7 @@ export default function Dashboard() {
               <article key={`${row.crop}-${row.marketId}`} className="dash-price-card">
                 <div>
                   <h3>{formatCrop(row.crop)}</h3>
-                  <p>{row.market?.name || formatRegion(row.market?.region)}</p>
+                  <p>{row.bestMarket || row.market?.name || formatRegion(row.market?.region)}</p>
                 </div>
                 <div className="dash-price-card__right">
                   <span className="price">{formatGmd(row.pricePerKg)}</span>
@@ -184,23 +178,31 @@ export default function Dashboard() {
       {!loading && matches.length ? (
         <section>
           <div className="section-head">
-            <h2>Buyer matches</h2>
+            <h2>{farmerView ? 'Buyer matches' : 'Supply matches'}</h2>
             <Link to="/buy-requests" className="section-link">
               {t('seeAll')}
             </Link>
           </div>
           <div className="dash-stack">
-            {matches.map((req) => (
-              <article key={req.id} className="dash-match">
-                <h3>
-                  {formatCrop(req.crop)} · {req.quantity}
-                  {req.unit}
-                </h3>
-                <p>
-                  {req.buyerName} offers {formatGmd(req.offerPrice)} · {formatRegion(req.region)}
-                </p>
-              </article>
-            ))}
+            {matches.map((match) => {
+              const opportunity = farmerView ? match.request : match.listing;
+              if (!opportunity) return null;
+              const quantity = opportunity.quantity;
+              const unit = opportunity.unit || 'kg';
+              const price = farmerView ? opportunity.offerPrice : opportunity.askingPrice;
+              const contactName = farmerView ? opportunity.buyerName : opportunity.farmerName;
+              return (
+                <article key={match.requestId || match.listingId} className="dash-match">
+                  <h3>
+                    {formatCrop(opportunity.crop)} · {quantity} {unit}
+                  </h3>
+                  <p>
+                    {contactName ? `${contactName} · ` : ''}
+                    {farmerView ? 'offers' : 'asks'} {formatGmd(price, unit)} · {formatRegion(opportunity.region)}
+                  </p>
+                </article>
+              );
+            })}
           </div>
         </section>
       ) : null}

@@ -64,6 +64,7 @@ export const userApi = {
   getMe: () => api.get('/users/me').then((r) => r.data),
   updateMe: (body) => api.patch('/users/me', body).then((r) => r.data),
   listUsers: (params) => api.get('/users', { params }).then((r) => r.data),
+  updateRole: (id, role) => api.patch(`/users/${id}/role`, { role }).then((r) => r.data),
 };
 
 export const dashboardApi = {

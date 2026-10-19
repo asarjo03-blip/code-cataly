@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import TopBar from '../components/TopBar.jsx';
 import { advisoryApi, alertApi, marketApi, userApi } from '../api/services.js';
 import { getErrorMessage } from '../api/client.js';
+import { useAuth } from '../context/AuthContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import { CROP_LABELS, REGION_LABELS, ROLE_LABELS, formatCrop, formatRegion } from '../utils/format.js';
 import './Forms.css';
@@ -9,9 +10,12 @@ import './Admin.css';
 
 export default function Admin() {
   const { t } = useLanguage();
+  const { user: currentUser } = useAuth();
   const [tab, setTab] = useState('prices');
   const [users, setUsers] = useState([]);
   const [markets, setMarkets] = useState([]);
+  const [roleDrafts, setRoleDrafts] = useState({});
+  const [savingUser, setSavingUser] = useState('');
   const [toast, setToast] = useState('');
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
@@ -103,6 +107,30 @@ export default function Admin() {
       setError(getErrorMessage(err, 'Could not publish advisory'));
     } finally {
       setSaving(false);
+    }
+  };
+
+  const submitRole = async (userId) => {
+    const role = roleDrafts[userId];
+    if (!role) return;
+    setSavingUser(userId);
+    setError('');
+    try {
+      const response = await userApi.updateRole(userId, role);
+      const updatedUser = response.data?.user;
+      setUsers((current) =>
+        current.map((user) => (user.id === userId ? { ...user, ...updatedUser, role } : user)),
+      );
+      setRoleDrafts((current) => {
+        const next = { ...current };
+        delete next[userId];
+        return next;
+      });
+      notify('User role updated.');
+    } catch (err) {
+      setError(getErrorMessage(err, 'Could not update user role'));
+    } finally {
+      setSavingUser('');
     }
   };
 
@@ -312,6 +340,34 @@ export default function Admin() {
                   <p>{u.crops.map((c) => formatCrop(c)).join(', ')}</p>
                 ) : null}
               </div>
+              {currentUser?.role === 'admin' && u.id !== currentUser.id ? (
+                <div className="list-item__actions">
+                  <label className="sr-only" htmlFor={`role-${u.id}`}>
+                    Role for {u.name}
+                  </label>
+                  <select
+                    id={`role-${u.id}`}
+                    value={roleDrafts[u.id] || u.role}
+                    onChange={(event) =>
+                      setRoleDrafts((current) => ({ ...current, [u.id]: event.target.value }))
+                    }
+                  >
+                    {Object.entries(ROLE_LABELS).map(([role, label]) => (
+                      <option key={role} value={role}>
+                        {label}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    className="btn btn-secondary"
+                    type="button"
+                    disabled={!roleDrafts[u.id] || roleDrafts[u.id] === u.role || savingUser === u.id}
+                    onClick={() => submitRole(u.id)}
+                  >
+                    {savingUser === u.id ? t('loading') : 'Save role'}
+                  </button>
+                </div>
+              ) : null}
             </article>
           ))}
           {!users?.length ? <p className="page-subtitle">No users loaded (admin/extension only).</p> : null}

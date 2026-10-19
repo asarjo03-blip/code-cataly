@@ -13,8 +13,19 @@ function authPayload(user) {
 }
 
 export const register = asyncHandler(async (request, response) => {
-  const { name, email, password, role = ROLES.FARMER, phone, region, village, crops, farmSizeHectares, language } =
-    request.body;
+  const {
+    name,
+    email,
+    password,
+    role = ROLES.FARMER,
+    phone,
+    region,
+    village,
+    crops,
+    farmSizeHectares,
+    farmingType,
+    language,
+  } = request.body;
 
   if (!PUBLIC_REGISTER_ROLES.includes(role)) {
     throw new HttpError(403, 'That role cannot be self-assigned');
@@ -23,6 +34,12 @@ export const register = asyncHandler(async (request, response) => {
   const existing = await User.findOne({ email: String(email).toLowerCase() });
   if (existing) {
     throw new HttpError(409, 'An account with that email already exists');
+  }
+  if (phone) {
+    const phoneTaken = await User.findOne({ phone });
+    if (phoneTaken) {
+      throw new HttpError(409, 'An account with that phone number already exists');
+    }
   }
 
   const passwordHash = await bcrypt.hash(password, 12);
@@ -36,6 +53,7 @@ export const register = asyncHandler(async (request, response) => {
     village,
     crops: crops || [],
     farmSizeHectares,
+    farmingType,
     language,
   });
 

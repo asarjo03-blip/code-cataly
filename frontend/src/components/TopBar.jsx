@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import LanguageSwitcher from './LanguageSwitcher.jsx';
+import { BellIcon, PinIcon } from './Icons.jsx';
 import { formatRegion } from '../utils/format.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import './TopBar.css';
@@ -13,7 +14,7 @@ export default function TopBar({ title, subtitle, showLocation = false, right = 
         <div>
           {showLocation && user?.region ? (
             <p className="top-bar__location">
-              <span aria-hidden="true">📍</span> {user.village || formatRegion(user.region)}
+              <PinIcon size={16} /> {user.village || formatRegion(user.region)}
             </p>
           ) : null}
           {title ? <h1 className="top-bar__title">{title}</h1> : null}
@@ -23,7 +24,7 @@ export default function TopBar({ title, subtitle, showLocation = false, right = 
           <LanguageSwitcher compact />
           {right}
           <Link to="/profile" className="top-bar__bell" aria-label="Account">
-            🔔
+            <BellIcon size={18} />
           </Link>
         </div>
       </div>

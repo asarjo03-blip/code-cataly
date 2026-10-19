@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import CropArt from '../components/CropArt.jsx';
 import ProduceCard from '../components/ProduceCard.jsx';
+import { SearchIcon } from '../components/Icons.jsx';
 import TopBar from '../components/TopBar.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
@@ -10,13 +12,13 @@ import { CROP_LABELS, REGION_LABELS, formatCrop } from '../utils/format.js';
 import './Marketplace.css';
 
 const CATEGORIES = [
-  { id: 'all', label: 'All', icon: '✦' },
-  { id: 'groundnut', label: 'Groundnut', icon: '🥜' },
-  { id: 'onion', label: 'Onion', icon: '🧅' },
-  { id: 'tomato', label: 'Tomato', icon: '🍅' },
-  { id: 'mango', label: 'Mango', icon: '🥭' },
-  { id: 'rice', label: 'Rice', icon: '🌾' },
-  { id: 'millet', label: 'Millet', icon: '🌿' },
+  { id: 'all', label: 'All' },
+  { id: 'groundnut', label: 'Groundnut' },
+  { id: 'onion', label: 'Onion' },
+  { id: 'tomato', label: 'Tomato' },
+  { id: 'mango', label: 'Mango' },
+  { id: 'rice', label: 'Rice' },
+  { id: 'millet', label: 'Millet' },
 ];
 
 export default function Marketplace() {
@@ -63,7 +65,7 @@ export default function Marketplace() {
       <TopBar showLocation title={t('marketplace')} subtitle="Find produce from Gambian farms" />
 
       <label className="search-bar">
-        <span aria-hidden="true">⌕</span>
+        <SearchIcon size={18} />
         <input
           type="search"
           placeholder={t('search')}
@@ -98,7 +100,8 @@ export default function Marketplace() {
             className={`chip ${crop === cat.id ? 'chip--active' : ''}`}
             onClick={() => setCrop(cat.id)}
           >
-            <span aria-hidden="true">{cat.icon}</span> {cat.label}
+            {cat.id !== 'all' ? <CropArt crop={cat.id} alt="" className="chip-crop" /> : null}
+            {cat.label}
           </button>
         ))}
       </div>

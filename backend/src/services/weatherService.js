@@ -1,21 +1,40 @@
 import { REGION_META, REGIONS } from '../config/constants.js';
-import { env } from '../config/env.js';
 import { getSeasonPhase } from '../utils/season.js';
 import { HttpError } from '../utils/httpError.js';
 
 const cache = new Map();
-const CACHE_TTL_MS = 15 * 60 * 1000;
+const CACHE_TTL_MS = 45 * 60 * 1000;
+
+const WMO_LABELS = {
+  0: 'Clear sky',
+  1: 'Mainly clear',
+  2: 'Partly cloudy',
+  3: 'Overcast',
+  45: 'Fog',
+  48: 'Rime fog',
+  51: 'Light drizzle',
+  53: 'Drizzle',
+  55: 'Dense drizzle',
+  61: 'Light rain',
+  63: 'Moderate rain',
+  65: 'Heavy rain',
+  71: 'Light snow',
+  80: 'Rain showers',
+  81: 'Heavy showers',
+  95: 'Thunderstorm',
+  96: 'Thunderstorm with hail',
+};
 
 const CLIMATOLOGY = {
   rainy: {
-    onset: { tempC: 29, humidity: 78, rainMm: 8, condition: 'Scattered thunderstorms', windKph: 14 },
-    peak: { tempC: 28, humidity: 85, rainMm: 16, condition: 'Heavy showers', windKph: 16 },
-    late: { tempC: 29, humidity: 80, rainMm: 7, condition: 'Occasional showers', windKph: 12 },
+    onset: { tempC: 29, humidity: 78, rainMm: 8, condition: 'Scattered thunderstorms', windKph: 14, code: 80 },
+    peak: { tempC: 28, humidity: 85, rainMm: 16, condition: 'Heavy showers', windKph: 16, code: 81 },
+    late: { tempC: 29, humidity: 80, rainMm: 7, condition: 'Occasional showers', windKph: 12, code: 61 },
   },
   dry: {
-    harvest: { tempC: 30, humidity: 48, rainMm: 0, condition: 'Mostly sunny', windKph: 12 },
-    harmattan: { tempC: 27, humidity: 28, rainMm: 0, condition: 'Hazy / dusty', windKph: 18 },
-    hot: { tempC: 34, humidity: 35, rainMm: 0, condition: 'Very hot and dry', windKph: 14 },
+    harvest: { tempC: 30, humidity: 48, rainMm: 0, condition: 'Mostly sunny', windKph: 12, code: 1 },
+    harmattan: { tempC: 27, humidity: 28, rainMm: 0, condition: 'Hazy / dusty', windKph: 18, code: 45 },
+    hot: { tempC: 34, humidity: 35, rainMm: 0, condition: 'Very hot and dry', windKph: 14, code: 0 },
   },
 };
 
@@ -68,14 +87,20 @@ function climatologySnapshot(location) {
       tempC: sample.tempC,
       humidity: sample.humidity,
       rainMm: sample.rainMm,
+      rainChance: sample.rainMm > 0 ? Math.min(95, 40 + sample.rainMm * 3) : 8,
       windKph: sample.windKph,
       condition: sample.condition,
+      code: sample.code,
     },
     forecast: Array.from({ length: 5 }, (_item, index) => ({
       dayOffset: index + 1,
+      date: new Date(Date.now() + (index + 1) * 86400000).toISOString().slice(0, 10),
+      label: new Date(Date.now() + (index + 1) * 86400000).toLocaleDateString('en-GB', { weekday: 'short' }),
       tempC: sample.tempC + ((index % 2) - 0.5),
+      maxTempC: sample.tempC + 1,
       rainMm: sample.rainMm,
       condition: sample.condition,
+      code: sample.code,
     })),
     season: phase,
     alerts: buildWeatherAlerts(sample, phase),
@@ -115,55 +140,55 @@ function buildWeatherAlerts(current, phase) {
   return alerts;
 }
 
-async function fetchOpenWeather(location) {
+function describeCode(code) {
+  return WMO_LABELS[code] || 'Mixed conditions';
+}
+
+async function fetchOpenMeteo(location) {
   const query = new URLSearchParams({
-    lat: String(location.lat),
-    lon: String(location.lon),
-    appid: env.openWeatherApiKey,
-    units: 'metric',
+    latitude: String(location.lat),
+    longitude: String(location.lon),
+    current: 'temperature_2m,relative_humidity_2m,precipitation,weather_code,wind_speed_10m',
+    daily: 'weather_code,temperature_2m_max,precipitation_sum,precipitation_probability_max',
+    forecast_days: '6',
+    timezone: 'Africa/Banjul',
   });
 
-  const [currentRes, forecastRes] = await Promise.all([
-    fetch(`https://api.openweathermap.org/data/2.5/weather?${query}`),
-    fetch(`https://api.openweathermap.org/data/2.5/forecast?${query}`),
-  ]);
-
-  if (!currentRes.ok || !forecastRes.ok) {
-    throw new Error('OpenWeather request failed');
-  }
-
-  const currentJson = await currentRes.json();
-  const forecastJson = await forecastRes.json();
+  const response = await fetch(`https://api.open-meteo.com/v1/forecast?${query}`);
+  if (!response.ok) throw new Error('Open-Meteo request failed');
+  const json = await response.json();
   const phase = getSeasonPhase();
+  const currentCode = json.current?.weather_code;
   const current = {
-    tempC: currentJson.main?.temp,
-    humidity: currentJson.main?.humidity,
-    rainMm: currentJson.rain?.['1h'] || currentJson.rain?.['3h'] || 0,
-    windKph: currentJson.wind?.speed ? Number((currentJson.wind.speed * 3.6).toFixed(1)) : 0,
-    condition: currentJson.weather?.[0]?.description || 'unknown',
+    tempC: json.current?.temperature_2m,
+    humidity: json.current?.relative_humidity_2m,
+    rainMm: json.current?.precipitation || 0,
+    rainChance: json.daily?.precipitation_probability_max?.[0] ?? (json.current?.precipitation > 0 ? 60 : 10),
+    windKph: json.current?.wind_speed_10m || 0,
+    condition: describeCode(currentCode),
+    code: currentCode,
   };
 
-  const byDay = new Map();
-  for (const item of forecastJson.list || []) {
-    const day = item.dt_txt.slice(0, 10);
-    if (!byDay.has(day)) {
-      byDay.set(day, {
-        date: day,
-        tempC: item.main?.temp,
-        rainMm: item.rain?.['3h'] || 0,
-        condition: item.weather?.[0]?.description || 'unknown',
-      });
-    }
-  }
+  const forecast = (json.daily?.time || []).slice(1, 6).map((date, index) => {
+    const code = json.daily.weather_code?.[index + 1];
+    return {
+      dayOffset: index + 1,
+      date,
+      label: new Date(`${date}T12:00:00`).toLocaleDateString('en-GB', { weekday: 'short' }),
+      tempC: json.daily.temperature_2m_max?.[index + 1],
+      maxTempC: json.daily.temperature_2m_max?.[index + 1],
+      rainMm: json.daily.precipitation_sum?.[index + 1] || 0,
+      rainChance: json.daily.precipitation_probability_max?.[index + 1] ?? 0,
+      condition: describeCode(code),
+      code,
+    };
+  });
 
   return {
-    source: 'openweathermap',
+    source: 'open-meteo',
     location,
     current,
-    forecast: [...byDay.values()].slice(0, 5).map((day, index) => ({
-      dayOffset: index + 1,
-      ...day,
-    })),
+    forecast,
     season: phase,
     alerts: buildWeatherAlerts(current, phase),
   };
@@ -177,12 +202,8 @@ export async function getWeather(params) {
     return { ...cached, cached: true };
   }
 
-  if (!env.openWeatherApiKey) {
-    return toCache(key, { ...climatologySnapshot(location), cached: false });
-  }
-
   try {
-    const live = await fetchOpenWeather(location);
+    const live = await fetchOpenMeteo(location);
     return toCache(key, { ...live, cached: false });
   } catch {
     return toCache(key, {

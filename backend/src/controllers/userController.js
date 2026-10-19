@@ -3,7 +3,7 @@ import { User } from '../models/User.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { HttpError } from '../utils/httpError.js';
 
-const PROFILE_FIELDS = ['name', 'phone', 'region', 'village', 'crops', 'farmSizeHectares', 'language'];
+const PROFILE_FIELDS = ['name', 'phone', 'region', 'village', 'crops', 'farmSizeHectares', 'farmingType', 'language'];
 
 export const getMyProfile = asyncHandler(async (request, response) => {
   response.json({ success: true, data: { user: request.user.toJSON() } });

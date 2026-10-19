@@ -18,7 +18,7 @@ const userSchema = new mongoose.Schema(
       default: ROLES.FARMER,
       index: true,
     },
-    phone: { type: String, trim: true },
+    phone: { type: String, trim: true, unique: true, sparse: true },
     region: {
       type: String,
       enum: Object.values(REGIONS),
@@ -27,6 +27,7 @@ const userSchema = new mongoose.Schema(
     village: { type: String, trim: true, maxlength: 120 },
     crops: { type: [String], default: [] },
     farmSizeHectares: { type: Number, min: 0, max: 1000 },
+    farmingType: { type: String, enum: ['rainfed', 'irrigated'], default: 'rainfed' },
     language: { type: String, enum: LANGUAGES, default: 'en' },
   },
   { timestamps: true },

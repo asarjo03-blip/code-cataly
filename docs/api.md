@@ -35,6 +35,12 @@ Regions: `banjul`, `kanifing`, `west_coast`, `north_bank`, `lower_river`, `centr
 - `POST /advice/generate` — generate advice for `region`, `crops`, optional `lat`/`lon`.
 - `GET /advice/crops` — crop knowledge used by the engine.
 
+## Crops and calendar
+
+- `GET /crops` — list available crops.
+- `GET /crops/:id/calendar` — calendar activity windows for a crop. Optional query: `region`.
+- `GET /crops/calendar/current` — current activities. Query: `crop` or comma-separated `crops`, optional `region`.
+
 ## Dashboard
 
 `GET /dashboard` — user summary, season, weather, alerts, top advice, and tracked crops.
@@ -59,6 +65,10 @@ Marketplace records are stored in MongoDB and shared between users. Listing and 
 - `POST /buy-requests` — create a buy request (`vendor`, `admin`). Body: `crop`, `quantity`, `offerPrice`, `region`, and optional `unit`, `neededBy`, `notes`.
 
 Both marketplace collections return `{ "success": true, "data": [...] }` for list endpoints. Individual records use the same envelope with one object in `data`.
+
+### Matching
+
+- `GET /matches` — authenticated users receive ranked matches for their listings or buy requests. Optional query: `crop`. Results include the matched `listing`, `request`, rank score, and match reasons. Matches require the same crop and unit, with nearby regions and compatible prices ranked first.
 
 ## Markets and prices
 

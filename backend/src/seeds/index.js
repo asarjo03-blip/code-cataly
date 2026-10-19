@@ -4,6 +4,7 @@ import { connectDatabase, disconnectDatabase } from '../config/db.js';
 import { REGIONS, ROLES } from '../config/constants.js';
 import { Crop } from '../models/Crop.js';
 import { Advisory } from '../models/Advisory.js';
+import { Alert } from '../models/Alert.js';
 import { BuyRequest } from '../models/BuyRequest.js';
 import { Listing } from '../models/Listing.js';
 import { Market } from '../models/Market.js';
@@ -22,6 +23,7 @@ const demoUsers = [
     village: 'Farafenni',
     crops: ['groundnut', 'millet', 'rice'],
     farmSizeHectares: 2.5,
+    farmingType: 'rainfed',
   },
   {
     name: 'Lamin Ceesay',
@@ -104,6 +106,36 @@ const demoAdvisories = [
   { seedKey: 'demo-mango-fruit-fly', title: 'Fruit fly management for mango', category: 'pest', crop: 'mango', summary: 'Protect ripening fruit from puncture damage.', body: 'Collect and bury fallen fruit. Harvest at the right maturity, use traps where available, and avoid leaving overripe fruit under trees. Clean packing areas to stop breeding.' },
   { seedKey: 'demo-onion-storage', title: 'Onion storage after harvest', category: 'storage', crop: 'onion', summary: 'Cure bulbs before long storage.', body: 'Cure onions in a shaded, airy place until necks are dry and skins rustle. Store in mesh bags or on racks, keep dry, and check weekly for soft bulbs.' },
   { seedKey: 'demo-planting-rains', title: 'Best practice: planting with the rains', category: 'general', crop: null, summary: 'Wait for two soaking rains before sowing rain-fed crops.', body: 'Dry planting wastes seed on sandy soils. After the first reliable rains, prepare land quickly and sow certified seed. Keep a small nursery of vegetables ready for transplant once beds hold moisture.' },
+];
+
+const demoAlerts = [
+  {
+    seedKey: 'demo-north-bank-rain',
+    type: 'weather',
+    severity: 'urgent',
+    region: REGIONS.NORTH_BANK,
+    cropIds: ['groundnut', 'millet'],
+    title: 'Heavy rain watch, North Bank',
+    message: 'Several wet days expected. Delay spraying and cover drying groundnuts.',
+  },
+  {
+    seedKey: 'demo-tomato-aphid',
+    type: 'pest',
+    severity: 'seasonal',
+    region: REGIONS.WEST_COAST,
+    cropIds: ['tomato', 'cabbage'],
+    title: 'Aphid pressure on vegetables',
+    message: 'Check undersides of tomato and cabbage leaves. Use soapy water early.',
+  },
+  {
+    seedKey: 'demo-groundnut-price',
+    type: 'market',
+    severity: 'info',
+    region: REGIONS.NORTH_BANK,
+    cropIds: ['groundnut'],
+    title: 'Groundnut prices firmer at Farafenni',
+    message: 'Traders are paying more than last week. Compare before you sell to a middleman.',
+  },
 ];
 
 async function seed() {
@@ -202,7 +234,18 @@ async function seed() {
     ),
   );
 
-  console.log(`Seeded crops, users, marketplace listings, markets, prices, and advisories.`);
+  const admin = await User.findOne({ email: 'admin@agriconnect.gm' });
+  await Promise.all(
+    demoAlerts.map((alert) =>
+      Alert.updateOne(
+        { title: alert.title, region: alert.region },
+        { $setOnInsert: { ...alert, createdBy: admin?._id } },
+        { upsert: true },
+      ),
+    ),
+  );
+
+  console.log(`Seeded crops, users, marketplace listings, markets, prices, advisories, and alerts.`);
   await disconnectDatabase();
 }
 

@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+import CropArt from '../components/CropArt.jsx';
 import ProduceCard from '../components/ProduceCard.jsx';
+import { BackIcon, CalendarIcon, HeartIcon, PinIcon, ScaleIcon, ShareIcon } from '../components/Icons.jsx';
 import { listingApi } from '../api/services.js';
 import { getErrorMessage } from '../api/client.js';
-import { getCropImage } from '../data/cropImages.js';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import {
   formatCrop,
@@ -76,20 +77,20 @@ export default function ListingDetail() {
     <div className="listing-detail">
       <header className="listing-detail__nav">
         <button type="button" onClick={() => navigate(-1)} aria-label="Back">
-          ←
+          <BackIcon />
         </button>
         <div>
           <button type="button" aria-label="Share" onClick={() => navigator.share?.({ title: listing.crop, url: window.location.href }).catch(() => {})}>
-            ⤴
+            <ShareIcon />
           </button>
           <button type="button" aria-label="Favourite">
-            ♡
+            <HeartIcon />
           </button>
         </div>
       </header>
 
       <div className="listing-detail__hero">
-        <img src={getCropImage(listing.crop)} alt={formatCrop(listing.crop)} />
+        <CropArt crop={listing.crop} />
       </div>
 
       <div className="listing-detail__body fade-in">
@@ -100,17 +101,17 @@ export default function ListingDetail() {
 
         <div className="listing-meta">
           <div>
-            <span aria-hidden="true">📍</span>
+            <PinIcon size={18} />
             <strong>Origin</strong>
             <p>{listing.village || formatRegion(listing.region)}</p>
           </div>
           <div>
-            <span aria-hidden="true">📅</span>
+            <CalendarIcon size={18} />
             <strong>Available</strong>
             <p>{formatDate(listing.availableFrom)}</p>
           </div>
           <div>
-            <span aria-hidden="true">⚖</span>
+            <ScaleIcon size={18} />
             <strong>Stock</strong>
             <p>
               {listing.quantity}

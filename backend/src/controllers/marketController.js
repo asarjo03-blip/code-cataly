@@ -3,7 +3,7 @@ import { MarketPrice } from '../models/MarketPrice.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { HttpError } from '../utils/httpError.js';
 
-async function pricesFor(filters = {}) {
+export async function pricesFor(filters = {}) {
   const match = {};
   if (filters.crop) match.crop = filters.crop;
   if (filters.marketId) match.marketId = filters.marketId;

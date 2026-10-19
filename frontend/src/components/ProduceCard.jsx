@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
+import CropArt from './CropArt.jsx';
+import { PlusIcon } from './Icons.jsx';
 import { formatCrop, formatGmd, formatRegion } from '../utils/format.js';
-import { getCropImage } from '../data/cropImages.js';
 import './ProduceCard.css';
 
 export default function ProduceCard({ listing, to }) {
@@ -9,9 +10,9 @@ export default function ProduceCard({ listing, to }) {
   return (
     <Link to={href} className="produce-card fade-in">
       <div className="produce-card__media">
-        <img src={getCropImage(listing.crop)} alt={formatCrop(listing.crop)} loading="lazy" />
+        <CropArt crop={listing.crop} />
         <span className="produce-card__add" aria-hidden="true">
-          +
+          <PlusIcon size={16} />
         </span>
       </div>
       <div className="produce-card__body">

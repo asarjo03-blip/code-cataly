@@ -1,4 +1,6 @@
+import { ADVICE_THRESHOLDS } from '../config/adviceThresholds.js';
 import { REGION_META } from '../config/constants.js';
+import { ACTIVITY_LABELS, currentActivities } from '../data/cropCalendar.js';
 import { CROP_KNOWLEDGE, findCrop, normalizeCrops } from './cropKnowledge.js';
 import { getSeasonPhase } from '../utils/season.js';
 
@@ -12,6 +14,8 @@ function cropAdvice(crop, context) {
   const { season, phase } = context.season;
   const rain = context.weather?.current?.rainMm || 0;
   const temp = context.weather?.current?.tempC || 0;
+  const dryDays = (context.weather?.forecast || []).filter((day) => (day.rainMm || 0) < 1).length;
+  const harvestRainDays = (context.weather?.forecast || []).filter((day) => (day.rainMm || 0) >= ADVICE_THRESHOLDS.heavyRainMm).length;
 
   if (crop.slug === 'groundnut') {
     if (phase === 'onset') {
@@ -81,7 +85,23 @@ function cropAdvice(crop, context) {
     });
   }
 
-  if (rain >= 12) {
+  if (context.farmingType === 'rainfed' && dryDays >= ADVICE_THRESHOLDS.drySpellDays) {
+    items.push({
+      title: `Protect rain-fed ${crop.name.toLowerCase()} through a dry spell`,
+      body: 'Mulch, delay further sowing, and water nurseries if you can. Rain-fed fields dry quickly on sandy uplands.',
+      priority: 'urgent',
+    });
+  }
+
+  if (harvestRainDays >= ADVICE_THRESHOLDS.harvestRainDays) {
+    items.push({
+      title: `Cover or harvest ${crop.name.toLowerCase()} before heavy rain`,
+      body: 'Several wet days are forecast. Harvest early if produce is mature, or cover drying groundnuts and grain.',
+      priority: 'urgent',
+    });
+  }
+
+  if (rain >= ADVICE_THRESHOLDS.heavyRainMm) {
     items.push({
       title: `Pause spraying on ${crop.name.toLowerCase()}`,
       body: 'Wait until foliage dries. Rain washes pesticide and foliar feeds off the leaf.',
@@ -89,7 +109,7 @@ function cropAdvice(crop, context) {
     });
   }
 
-  if (temp >= 33 && crop.category === 'horticulture') {
+  if (temp >= ADVICE_THRESHOLDS.heatTempC && crop.category === 'horticulture') {
     items.push({
       title: `Shade ${crop.name.toLowerCase()} during peak heat`,
       body: 'Use 30–40% shade net or intercrop tall millet on bed edges to reduce blossom drop.',
@@ -113,7 +133,7 @@ function cropAdvice(crop, context) {
   }));
 }
 
-export function generateAdvice({ region, crops = [], weather, date } = {}) {
+export function generateAdvice({ region, crops = [], weather, date, farmingType = 'rainfed' } = {}) {
   const season = getSeasonPhase(date);
   const regionLabel = REGION_META[region]?.label || region || 'The Gambia';
   const selected = normalizeCrops(crops);
@@ -122,8 +142,19 @@ export function generateAdvice({ region, crops = [], weather, date } = {}) {
     .filter(Boolean)
     .filter((crop) => selected.length > 0 || !region || crop.regions.includes(region));
 
-  const context = { region, season, weather };
+  const context = { region, season, weather, farmingType };
   const items = [];
+
+  for (const activity of currentActivities(selected.length ? selected : [], undefined, region)) {
+    items.push({
+      title: `${ACTIVITY_LABELS[activity.activity] || activity.activity} window for ${activity.crop}`,
+      body: activity.notes,
+      priority: activity.activity === 'plant' || activity.activity === 'harvest' ? 'seasonal' : 'general',
+      crop: activity.crop,
+      region,
+      tags: [activity.activity, 'calendar'],
+    });
+  }
 
   items.push({
     title: `${season.label} in ${regionLabel}`,

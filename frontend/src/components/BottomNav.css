@@ -44,9 +44,8 @@
   background: var(--color-primary-soft);
 }
 
-.bottom-nav__icon {
-  font-size: 1rem;
-  line-height: 1;
+.bottom-nav__item svg {
+  display: block;
 }
 
 .bottom-nav__cart {

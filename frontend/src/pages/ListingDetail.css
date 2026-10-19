@@ -42,9 +42,9 @@
 }
 
 .listing-detail__hero img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  width: 72%;
+  height: 72%;
+  object-fit: contain;
 }
 
 .listing-detail__body {

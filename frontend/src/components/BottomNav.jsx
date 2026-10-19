@@ -1,9 +1,8 @@
 import { NavLink } from 'react-router-dom';
+import { AccountIcon, AdviceIcon, HomeIcon, MarketsIcon, PlusIcon, ShopIcon } from './Icons.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import './BottomNav.css';
-
-const Icon = ({ children }) => <span className="bottom-nav__icon" aria-hidden="true">{children}</span>;
 
 export default function BottomNav() {
   const { t } = useLanguage();
@@ -15,28 +14,28 @@ export default function BottomNav() {
     <nav className="bottom-nav" aria-label="Main">
       <div className="bottom-nav__inner">
         <NavLink to="/dashboard" className={({ isActive }) => `bottom-nav__item ${isActive ? 'is-active' : ''}`}>
-          <Icon>⌂</Icon>
+          <HomeIcon />
           <span>{t('navHome')}</span>
         </NavLink>
         <NavLink to="/markets" className={({ isActive }) => `bottom-nav__item ${isActive ? 'is-active' : ''}`}>
-          <Icon>◎</Icon>
+          <MarketsIcon />
           <span>{t('navMarkets')}</span>
         </NavLink>
         <NavLink to="/marketplace" className={({ isActive }) => `bottom-nav__item ${isActive ? 'is-active' : ''}`}>
-          <Icon>▣</Icon>
+          <ShopIcon />
           <span>{t('navShop')}</span>
         </NavLink>
         <NavLink to="/advisory" className={({ isActive }) => `bottom-nav__item ${isActive ? 'is-active' : ''}`}>
-          <Icon>✦</Icon>
+          <AdviceIcon />
           <span>{t('navAdvice')}</span>
         </NavLink>
         <NavLink to="/profile" className={({ isActive }) => `bottom-nav__item ${isActive ? 'is-active' : ''}`}>
-          <Icon>○</Icon>
+          <AccountIcon />
           <span>{t('navAccount')}</span>
         </NavLink>
         {isFarmer && (
           <NavLink to="/my-listings" className="bottom-nav__cart" aria-label={t('myListings')}>
-            +
+            <PlusIcon />
           </NavLink>
         )}
       </div>

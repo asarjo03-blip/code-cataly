@@ -14,6 +14,8 @@ import { buyRequestRouter, listingRouter } from './routes/listingRoutes.js';
 import advisoryRoutes from './routes/advisoryRoutes.js';
 import alertRoutes from './routes/alertRoutes.js';
 import marketRoutes from './routes/marketRoutes.js';
+import cropRoutes from './routes/cropRoutes.js';
+import matchRoutes from './routes/matchRoutes.js';
 
 const app = express();
 
@@ -38,6 +40,8 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/listings', listingRouter);
 app.use('/api/buy-requests', buyRequestRouter);
 app.use('/api/markets', marketRoutes);
+app.use('/api/crops', cropRoutes);
+app.use('/api/matches', matchRoutes);
 app.use('/api/advisories', advisoryRoutes);
 app.use('/api/alerts', alertRoutes);
 
