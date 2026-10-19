@@ -1,0 +1,16 @@
+{
+  "name": "agriconnect-gambia",
+  "private": true,
+  "workspaces": ["frontend", "backend"],
+  "scripts": {
+    "dev:frontend": "npm run dev --workspace frontend",
+    "dev:backend": "npm run dev --workspace backend",
+    "dev": "concurrently \"npm:dev:backend\" \"npm:dev:frontend\"",
+    "seed": "npm run seed --workspace backend",
+    "lint": "eslint ."
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "eslint": "^9.17.0"
+  }
+}
