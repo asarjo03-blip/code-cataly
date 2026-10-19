@@ -1,7 +1,12 @@
 .advisory-list {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 0.75rem;
   margin-top: 0.5rem;
+}
+
+.advisory-list > * {
+  min-width: 0;
 }
 
 .advisory-card {
@@ -61,4 +66,21 @@
   font-size: var(--text-md);
   line-height: 1.6;
   color: var(--color-ink-soft);
+}
+
+@media (min-width: 700px) {
+  .advisory-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1100px) {
+  .advisory-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .advisory-detail {
+    max-width: 56rem;
+    margin-inline: auto;
+  }
 }

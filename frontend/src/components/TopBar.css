@@ -9,6 +9,10 @@
   gap: var(--space-3);
 }
 
+.top-bar__row > * {
+  min-width: 0;
+}
+
 .top-bar__location {
   display: inline-flex;
   align-items: center;
@@ -30,6 +34,7 @@
   margin-top: 0.2rem;
   color: var(--color-ink-muted);
   font-size: var(--text-sm);
+  overflow-wrap: anywhere;
 }
 
 .top-bar__actions {
@@ -47,4 +52,18 @@
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   font-size: 0.95rem;
+}
+
+@media (max-width: 359px) {
+  .top-bar__row {
+    gap: var(--space-2);
+  }
+
+  .top-bar__title {
+    font-size: var(--text-lg);
+  }
+
+  .top-bar__subtitle {
+    font-size: var(--text-xs);
+  }
 }

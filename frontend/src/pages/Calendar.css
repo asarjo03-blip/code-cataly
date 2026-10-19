@@ -15,6 +15,7 @@
   padding: 1rem;
   box-shadow: var(--shadow-soft);
   border: 1.5px solid transparent;
+  min-width: 0;
 }
 
 .cal-card.is-current {
@@ -65,4 +66,10 @@
 .cal-seg.is-today {
   outline: 2px solid var(--color-cta);
   outline-offset: 1px;
+}
+
+@media (min-width: 900px) {
+  .calendar-timeline {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }

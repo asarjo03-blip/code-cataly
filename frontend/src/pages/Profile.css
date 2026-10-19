@@ -4,6 +4,12 @@
   gap: 0.9rem;
   padding: 1rem;
   margin-bottom: 1rem;
+  min-width: 0;
+}
+
+.profile-hero > div:last-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .profile-hero__avatar {
@@ -29,7 +35,7 @@
 
 .profile-links {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.55rem;
   margin-bottom: 1rem;
 }
@@ -44,4 +50,11 @@
   border: 1.5px solid var(--color-border);
   font-size: var(--text-sm);
   font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+@media (min-width: 768px) {
+  .profile-links {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
 }

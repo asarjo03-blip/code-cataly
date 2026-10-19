@@ -13,8 +13,12 @@
 
 .form-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.75rem;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+}
+
+.form-grid > * {
+  min-width: 0;
 }
 
 .form-page__toast {
@@ -39,6 +43,11 @@
   box-shadow: var(--shadow-soft);
   display: grid;
   gap: 0.65rem;
+  min-width: 0;
+}
+
+.list-item > * {
+  min-width: 0;
 }
 
 .list-item h3 {
@@ -55,6 +64,17 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.65rem;
+  align-items: center;
+}
+
+.list-item__actions select {
+  min-width: 0;
+  max-width: 100%;
+  min-height: var(--tap);
+  padding: 0.5rem 0.75rem;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
 }
 
 .list-item__actions a,
@@ -66,4 +86,28 @@
 
 .list-item__actions .danger {
   color: var(--color-accent);
+}
+
+@media (min-width: 520px) {
+  .form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .list-item {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+  }
+}
+
+@media (max-width: 359px) {
+  .list-item {
+    padding: 0.85rem;
+  }
+
+  .list-item__actions {
+    gap: 0.5rem;
+  }
 }
