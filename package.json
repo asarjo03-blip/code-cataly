@@ -6,12 +6,17 @@
     "backend"
   ],
   "scripts": {
+    "build": "npm run build --workspace frontend",
+    "start": "npm run start --workspace backend",
     "dev:frontend": "npm run dev --workspace frontend",
     "dev:backend": "npm run dev --workspace backend",
     "dev": "concurrently \"npm:dev:backend\" \"npm:dev:frontend\"",
     "seed": "npm run seed --workspace backend",
     "lint": "eslint .",
     "test": "npm run test --workspace backend"
+  },
+  "engines": {
+    "node": "24.x"
   },
   "devDependencies": {
     "concurrently": "^9.1.2",

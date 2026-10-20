@@ -5,8 +5,8 @@ import { env } from './config/env.js';
 
 async function start() {
   await connectDatabase();
-  app.listen(env.port, () => {
-    console.log(`AgriConnect API listening on port ${env.port}`);
+  app.listen(env.port, '0.0.0.0', () => {
+    console.log(`AgriConnect listening on port ${env.port}`);
   });
 }
 

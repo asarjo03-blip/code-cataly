@@ -32,10 +32,23 @@ export const ShopIcon = (props) => (
   </Svg>
 );
 
+export const BasketIcon = (props) => (
+  <Svg {...props}>
+    <path d="m5 10 1.2 10h11.6L19 10H5z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round"/>
+    <path d="m9 10 3-6 3 6M9 13v4M12 13v4M15 13v4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+  </Svg>
+);
+
 export const AdviceIcon = (props) => (
   <Svg {...props}>
     <path d="M12 3c4.5 5 7 9 7 12a7 7 0 1 1-14 0c0-3 2.5-7 7-12z" stroke="currentColor" strokeWidth="1.8"/>
     <path d="M12 14v4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+  </Svg>
+);
+
+export const BulbIcon = (props) => (
+  <Svg {...props}>
+    <path d="M9 18h6M10 21h4M8.2 14.8a7 7 0 1 1 7.6 0c-.9.6-1.3 1.4-1.3 2.2h-5c0-.8-.4-1.6-1.3-2.2z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
   </Svg>
 );
 
