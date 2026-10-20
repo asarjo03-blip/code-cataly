@@ -23,6 +23,18 @@ This repository includes a `render.yaml` Blueprint for a single Node web service
 
 The app uses `/api` on the same origin in production, so no frontend API URL or CORS setting is needed. The Blueprint uses Render's free web service plan; free services may spin down when idle. The database must be provisioned separately, and demo seed accounts use published sample passwords, so do not seed them into a public production database.
 
+## Deploy the frontend on Netlify
+
+The frontend includes `frontend/netlify.toml` with the Vite build settings and a rewrite for browser routes, so direct links such as `/marketplace` continue to work.
+
+1. Push the repository to a Git provider supported by Netlify and create a new site from the repository.
+2. In the Netlify build settings, set the base directory to `frontend` and the Netlify configuration file path to `frontend/netlify.toml`. The build command is `npm run build` and the publish directory is `dist`.
+3. If deploying only the frontend without a reachable API, no environment variables are required; the app uses browser-local demo mode when the API is unavailable.
+4. To connect to a separately deployed backend, add `VITE_API_URL` in the Netlify site's environment variables with the backend API base URL, for example `https://your-backend.example.com/api`, then trigger a new deploy. The backend must allow requests from your Netlify site origin.
+5. Deploy and verify both the home page and a direct route such as `/marketplace`.
+
+Do not put secrets in `VITE_` variables; Vite embeds them in the public frontend bundle. For a single-origin frontend and backend deployment without CORS configuration, use the Render deployment described above.
+
 For a local production-style run, use `npm run build` followed by `npm start` with `NODE_ENV=production`, `DATABASE_URL`, and `JWT_SECRET` configured.
 
 Demo accounts (password `Password123`):
