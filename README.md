@@ -17,7 +17,7 @@ This repository includes a `render.yaml` Blueprint for a single Node web service
 
 1. Push this repository to a Git provider supported by Render.
 2. In Render, create a new **Blueprint** and select this repository. Render reads `render.yaml` and configures the build, start, and health check commands.
-3. Provide `DATABASE_URL` when prompted. It must be a reachable MongoDB connection string, for example from MongoDB Atlas; Render does not provide a MongoDB service through this Blueprint.
+3. Provide `DATABASE_URL` when prompted. It must be a reachable MongoDB connection string, for example from MongoDB Atlas; Render does not provide a MongoDB service through this Blueprint. The backend also accepts `MONGODB_URI` or `MONGO_URI` if your MongoDB provider uses one of those names.
 4. Keep the generated `JWT_SECRET` private. Render generates it from the Blueprint.
 5. Deploy. The health endpoint is `/api/health`, and the deployed web service serves the frontend at its root URL.
 
