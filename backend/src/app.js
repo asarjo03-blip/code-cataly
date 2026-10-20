@@ -1,8 +1,10 @@
 import cors from 'cors';
 import express from 'express';
+import { existsSync } from 'node:fs';
 import helmet from 'helmet';
 import mongoose from 'mongoose';
 import morgan from 'morgan';
+import { fileURLToPath } from 'node:url';
 import { env } from './config/env.js';
 import { errorHandler, notFound } from './middleware/errorHandler.js';
 import adviceRoutes from './routes/adviceRoutes.js';
@@ -44,6 +46,16 @@ app.use('/api/crops', cropRoutes);
 app.use('/api/matches', matchRoutes);
 app.use('/api/advisories', advisoryRoutes);
 app.use('/api/alerts', alertRoutes);
+
+const frontendDist = fileURLToPath(new URL('../../frontend/dist/', import.meta.url));
+if (env.nodeEnv === 'production' && existsSync(frontendDist)) {
+  app.use(express.static(frontendDist));
+  app.get(/^(?!\/api(?:\/|$)).*/, (_request, response, next) => {
+    response.sendFile(fileURLToPath(new URL('../../frontend/dist/index.html', import.meta.url)), (error) => {
+      if (error) next(error);
+    });
+  });
+}
 
 app.use(notFound);
 app.use(errorHandler);
