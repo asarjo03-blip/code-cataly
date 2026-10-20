@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { AccountIcon, AdviceIcon, HomeIcon, MarketsIcon, PlusIcon, ShopIcon } from './Icons.jsx';
+import { AccountIcon, AdviceIcon, FarmIcon, HomeIcon, MarketsIcon, PlusIcon, ShopIcon } from './Icons.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import './BottomNav.css';
@@ -24,6 +24,10 @@ export default function BottomNav() {
         <NavLink to="/marketplace" className={({ isActive }) => `bottom-nav__item ${isActive ? 'is-active' : ''}`}>
           <ShopIcon />
           <span>{t('navShop')}</span>
+        </NavLink>
+        <NavLink to="/livestock" className={({ isActive }) => `bottom-nav__item ${isActive ? 'is-active' : ''}`}>
+          <FarmIcon />
+          <span>{t('navLivestock')}</span>
         </NavLink>
         <NavLink to="/advisory" className={({ isActive }) => `bottom-nav__item ${isActive ? 'is-active' : ''}`}>
           <AdviceIcon />

@@ -5,6 +5,7 @@ import ProduceCard from '../components/ProduceCard.jsx';
 import { BackIcon, CalendarIcon, HeartIcon, PinIcon, ScaleIcon, ShareIcon } from '../components/Icons.jsx';
 import { listingApi } from '../api/services.js';
 import { getErrorMessage } from '../api/client.js';
+import { useBackendRecovery } from '../hooks/useBackendRecovery.js';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import {
   formatCrop,
@@ -20,6 +21,7 @@ export default function ListingDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const backendRecovery = useBackendRecovery();
   const [listing, setListing] = useState(null);
   const [similar, setSimilar] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -53,7 +55,7 @@ export default function ListingDetail() {
     return () => {
       active = false;
     };
-  }, [id]);
+  }, [id, backendRecovery]);
 
   if (!listing) {
     return (
@@ -65,6 +67,7 @@ export default function ListingDetail() {
   }
 
   const standardQty = Math.min(listing.quantity, Math.max(10, Math.round(listing.quantity / 4)));
+  const soldOut = listing.status === 'sold' || Number(listing.quantity) <= 0;
   const doubleQty = Math.min(listing.quantity, standardQty * 2);
   const selectedQty = caseSize === 'standard' ? standardQty : doubleQty;
   const maxLots = Math.max(1, Math.floor(listing.quantity / selectedQty));
@@ -95,6 +98,7 @@ export default function ListingDetail() {
 
       <div className="listing-detail__body fade-in">
         <h1>{formatCrop(listing.crop)} Fresh Farm Pick from {listing.village || formatRegion(listing.region)}</h1>
+        {soldOut ? <p className="listing-detail__sold-out">{t('soldOut')}</p> : null}
         <div className="listing-detail__price">
           <span className="price">{formatGmd(listing.askingPrice, listing.unit)}</span>
         </div>
@@ -120,10 +124,34 @@ export default function ListingDetail() {
           </div>
         </div>
 
+        <section className="listing-seller" aria-labelledby="listing-seller-title">
+          <div>
+            <h2 id="listing-seller-title">{t('sellerContact')}</h2>
+            <p className="listing-seller__name">{listing.farmerName || 'Farmer'}</p>
+            {listing.farmerPhone ? (
+              <a className="listing-seller__phone" href={telLink(listing.farmerPhone)}>
+                {listing.farmerPhone}
+              </a>
+            ) : (
+              <p className="listing-seller__unavailable">{t('contactNotAvailable')}</p>
+            )}
+          </div>
+          {listing.farmerPhone ? (
+            <a
+              className="btn btn-outline"
+              href={whatsappLink(listing.farmerPhone, `Hello ${listing.farmerName || 'farmer'}, I am contacting you about your ${formatCrop(listing.crop)} listing on AgriConnect.`)}
+              target="_blank"
+              rel="noreferrer"
+            >
+              {t('whatsapp')}
+            </a>
+          ) : null}
+        </section>
+
         {listing.notes ? <p className="listing-detail__notes">{listing.notes}</p> : null}
 
-        <h2>{t('selectCase')}</h2>
-        <div className="case-options">
+        {!soldOut ? <h2>{t('selectCase')}</h2> : null}
+        {!soldOut ? <div className="case-options">
           <button
             type="button"
             className={`case-card ${caseSize === 'standard' ? 'is-selected' : ''}`}
@@ -146,7 +174,7 @@ export default function ListingDetail() {
             <strong>Double — {doubleQty}{listing.unit}</strong>
             <span>{formatGmd(doubleQty * listing.askingPrice, 'lot')}</span>
           </button>
-        </div>
+        </div> : null}
 
         <div className="section-head">
           <h2>Similar products</h2>
@@ -160,7 +188,7 @@ export default function ListingDetail() {
         </div>
       </div>
 
-      <footer className="listing-detail__footer">
+      {!soldOut ? <footer className="listing-detail__footer">
         <div className="qty-control">
           <button type="button" onClick={() => setQty((q) => Math.max(1, q - 1))} aria-label="Decrease">
             −
@@ -178,7 +206,7 @@ export default function ListingDetail() {
             {t('whatsapp')} · D{total.toFixed(0)}
           </a>
         </div>
-      </footer>
+      </footer> : null}
     </div>
   );
 }

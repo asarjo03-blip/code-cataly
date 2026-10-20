@@ -5,6 +5,56 @@
   margin-top: 0.5rem;
 }
 
+.soil-guide {
+  display: grid;
+  gap: 0.8rem;
+  margin-bottom: 1.25rem;
+}
+
+.soil-guide__heading h2 {
+  font-size: var(--text-lg);
+}
+
+.soil-guide__heading p,
+.soil-guide__note {
+  margin-top: 0.3rem;
+  color: var(--color-ink-muted);
+  font-size: var(--text-xs);
+}
+
+.soil-guide__grid {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.soil-guide__card {
+  padding: 0.85rem;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.soil-guide__card h3 {
+  font-size: var(--text-sm);
+}
+
+.soil-guide__card p {
+  margin-top: 0.35rem;
+  color: var(--color-ink-soft);
+  font-size: var(--text-xs);
+  line-height: 1.5;
+}
+
+.soil-guide__card strong {
+  display: block;
+  margin-top: 0.45rem;
+  color: var(--color-primary-dark);
+  font-size: var(--text-xs);
+}
+
+.soil-guide__note {
+  margin-top: 0;
+}
+
 .advisory-list > * {
   min-width: 0;
 }
@@ -69,6 +119,10 @@
 }
 
 @media (min-width: 700px) {
+  .soil-guide__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .advisory-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }

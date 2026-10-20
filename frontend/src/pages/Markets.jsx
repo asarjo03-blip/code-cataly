@@ -3,11 +3,13 @@ import PriceChart from '../components/PriceChart.jsx';
 import TopBar from '../components/TopBar.jsx';
 import { marketApi } from '../api/services.js';
 import { useLanguage } from '../context/LanguageContext.jsx';
+import { useBackendRecovery } from '../hooks/useBackendRecovery.js';
 import { CROP_LABELS, formatCrop, formatGmd, formatRegion, trendLabel } from '../utils/format.js';
 import './Markets.css';
 
 export default function Markets() {
   const { t } = useLanguage();
+  const backendRecovery = useBackendRecovery();
   const [markets, setMarkets] = useState([]);
   const [crop, setCrop] = useState('groundnut');
   const [compare, setCompare] = useState(null);
@@ -28,7 +30,7 @@ export default function Markets() {
     return () => {
       active = false;
     };
-  }, []);
+  }, [backendRecovery]);
 
   useEffect(() => {
     let active = true;
@@ -45,7 +47,7 @@ export default function Markets() {
     return () => {
       active = false;
     };
-  }, [crop]);
+  }, [crop, backendRecovery]);
 
   useEffect(() => {
     let active = true;
@@ -60,7 +62,7 @@ export default function Markets() {
     return () => {
       active = false;
     };
-  }, [crop, selectedMarket]);
+  }, [crop, selectedMarket, backendRecovery]);
 
   const crops = useMemo(() => Object.keys(CROP_LABELS), []);
 

@@ -4,6 +4,7 @@ import { advisoryApi, alertApi, marketApi, userApi } from '../api/services.js';
 import { getErrorMessage } from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
+import { useBackendRecovery } from '../hooks/useBackendRecovery.js';
 import { CROP_LABELS, REGION_LABELS, ROLE_LABELS, formatCrop, formatRegion } from '../utils/format.js';
 import './Forms.css';
 import './Admin.css';
@@ -11,6 +12,7 @@ import './Admin.css';
 export default function Admin() {
   const { t } = useLanguage();
   const { user: currentUser } = useAuth();
+  const backendRecovery = useBackendRecovery();
   const [tab, setTab] = useState('prices');
   const [users, setUsers] = useState([]);
   const [markets, setMarkets] = useState([]);
@@ -49,14 +51,14 @@ export default function Admin() {
         setUsers(payload?.users || (Array.isArray(payload) ? payload : []));
       })
       .catch((err) => setError(getErrorMessage(err, 'Could not load users')));
-  }, []);
+  }, [backendRecovery]);
 
   useEffect(() => {
     marketApi
       .list()
       .then((res) => setMarkets(res.data || []))
       .catch((err) => setError(getErrorMessage(err, 'Could not load markets')));
-  }, []);
+  }, [backendRecovery]);
 
   const notify = (text) => {
     setToast(text);

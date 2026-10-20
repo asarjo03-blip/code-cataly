@@ -8,6 +8,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import { listingApi } from '../api/services.js';
 import { getErrorMessage } from '../api/client.js';
+import { useBackendRecovery } from '../hooks/useBackendRecovery.js';
 import { CROP_LABELS, REGION_LABELS, formatCrop } from '../utils/format.js';
 import './Marketplace.css';
 
@@ -23,6 +24,7 @@ const CATEGORIES = [
 
 export default function Marketplace() {
   const { t } = useLanguage();
+  const backendRecovery = useBackendRecovery();
   const { isFarmer, isBuyer, isAuthenticated } = useAuth();
   const [q, setQ] = useState('');
   const [crop, setCrop] = useState('all');
@@ -58,11 +60,33 @@ export default function Marketplace() {
       active = false;
       window.clearTimeout(timeout);
     };
-  }, [q, crop, region, maxPrice]);
+  }, [q, crop, region, maxPrice, backendRecovery]);
 
   return (
     <div className="marketplace-page">
       <TopBar showLocation title={t('marketplace')} subtitle="Find produce from Gambian farms" />
+
+      <figure className="marketplace-market-photo">
+        <img
+          src="/images/serrekunda-market-chilli.jpg"
+          alt="Fresh chilli peppers for sale at Serrekunda Market in The Gambia"
+          fetchPriority="high"
+        />
+        <figcaption>
+          Serrekunda Market, The Gambia · Photo by{' '}
+          <a
+            href="https://commons.wikimedia.org/wiki/File:Chilli_by_the_dozen,_Serrekunda_market,_The_Gambia_(6646713697).jpg"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Forbes Johnston
+          </a>{' '}
+          ·{' '}
+          <a href="https://creativecommons.org/licenses/by/2.0/" target="_blank" rel="noreferrer">
+            CC BY 2.0
+          </a>
+        </figcaption>
+      </figure>
 
       <label className="search-bar">
         <SearchIcon size={18} />

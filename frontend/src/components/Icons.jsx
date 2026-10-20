@@ -101,6 +101,13 @@ export const LeafIcon = (props) => (
   </Svg>
 );
 
+export const FarmIcon = (props) => (
+  <Svg {...props}>
+    <path d="M3 20h18M5 20V9l7-5 7 5v11M9 20v-6h6v6" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round"/>
+    <path d="M9 10h.01M15 10h.01" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"/>
+  </Svg>
+);
+
 export const ScaleIcon = (props) => (
   <Svg {...props}>
     <path d="M12 4v16M4 8h16" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>

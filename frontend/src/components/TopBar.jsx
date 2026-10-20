@@ -1,6 +1,5 @@
-import { Link } from 'react-router-dom';
-import LanguageSwitcher from './LanguageSwitcher.jsx';
-import { BellIcon, PinIcon } from './Icons.jsx';
+import SettingsMenu from './SettingsMenu.jsx';
+import { PinIcon } from './Icons.jsx';
 import { formatRegion } from '../utils/format.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import './TopBar.css';
@@ -21,11 +20,8 @@ export default function TopBar({ title, subtitle, showLocation = false, right = 
           {subtitle ? <p className="top-bar__subtitle">{subtitle}</p> : null}
         </div>
         <div className="top-bar__actions">
-          <LanguageSwitcher compact />
           {right}
-          <Link to="/profile" className="top-bar__bell" aria-label="Account">
-            <BellIcon size={18} />
-          </Link>
+          <SettingsMenu />
         </div>
       </div>
     </header>

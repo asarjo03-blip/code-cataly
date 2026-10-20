@@ -1,9 +1,15 @@
 .form-card {
+  width: 100%;
   background: var(--color-surface);
   border-radius: var(--radius-xl);
   padding: 1.15rem;
   box-shadow: var(--shadow-soft);
   margin-bottom: 1.25rem;
+}
+
+.form-page > .form-card {
+  max-width: 52rem;
+  margin-inline: auto;
 }
 
 .form-card h2 {
@@ -103,6 +109,10 @@
 }
 
 @media (max-width: 359px) {
+  .form-card {
+    padding: 0.9rem;
+  }
+
   .list-item {
     padding: 0.85rem;
   }

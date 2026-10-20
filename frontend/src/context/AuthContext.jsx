@@ -1,6 +1,11 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { authApi, userApi } from '../api/services.js';
-import { getErrorMessage, isBackendUnavailable, markBackendUnavailable } from '../api/client.js';
+import {
+  getErrorMessage,
+  isBackendUnavailable,
+  markBackendUnavailable,
+  OFFLINE_STATUS_EVENT,
+} from '../api/client.js';
 import { readJson, removeKey, writeJson } from '../utils/storage.js';
 
 const AuthContext = createContext(null);
@@ -27,9 +32,17 @@ export function AuthProvider({ children }) {
         setLoading(false);
         return;
       }
+      if (token.startsWith('demo-')) {
+        markBackendUnavailable();
+        setLoading(false);
+        return;
+      }
       try {
         const res = await authApi.me();
-        if (active) persist(token, res.data.user);
+        if (active) {
+          if (res.data.user) persist(token, res.data.user);
+          else persist(null, null);
+        }
       } catch (err) {
         if (!active) return;
         if (isBackendUnavailable(err)) {
@@ -48,6 +61,37 @@ export function AuthProvider({ children }) {
     hydrate();
     return () => {
       active = false;
+    };
+  }, [token, persist]);
+
+  useEffect(() => {
+    if (!token || token.startsWith('demo-')) return undefined;
+
+    const refreshSession = async (event) => {
+      if (event.detail?.isOffline !== false) return;
+      try {
+        const res = await authApi.me();
+        if (active) {
+          if (res.data.user) persist(token, res.data.user);
+          else persist(null, null);
+        }
+      } catch (err) {
+        if (!active) return;
+        if (isBackendUnavailable(err)) {
+          markBackendUnavailable();
+        } else if (err.response?.status === 401) {
+          persist(null, null);
+        } else {
+          setError(getErrorMessage(err, 'Could not refresh your session'));
+        }
+      }
+    };
+
+    let active = true;
+    window.addEventListener(OFFLINE_STATUS_EVENT, refreshSession);
+    return () => {
+      active = false;
+      window.removeEventListener(OFFLINE_STATUS_EVENT, refreshSession);
     };
   }, [token, persist]);
 

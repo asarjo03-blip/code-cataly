@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
-import LanguageSwitcher from '../components/LanguageSwitcher.jsx';
+import SettingsMenu from '../components/SettingsMenu.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import './Auth.css';
@@ -13,8 +13,9 @@ export default function Login() {
   const [email, setEmail] = useState('farmer@agriconnect.gm');
   const [password, setPassword] = useState('Password123');
   const [submitting, setSubmitting] = useState(false);
+  const allowAccountSwitch = new URLSearchParams(location.search).get('switch') === '1';
 
-  if (!loading && isAuthenticated) {
+  if (!loading && isAuthenticated && !allowAccountSwitch) {
     return <Navigate to={location.state?.from?.pathname || '/dashboard'} replace />;
   }
 
@@ -39,7 +40,7 @@ export default function Login() {
           <Link to="/" className="auth-page__brand">
             AgriConnect
           </Link>
-          <LanguageSwitcher compact />
+          <SettingsMenu />
         </div>
         <h1>{t('login')}</h1>
         <p className="auth-page__hint">Demo: farmer@agriconnect.gm / Password123</p>

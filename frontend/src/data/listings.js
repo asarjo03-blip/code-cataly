@@ -154,7 +154,11 @@ function ensureRequests() {
 }
 
 export function listListings(filters = {}) {
-  let items = ensureListings().filter((l) => l.status === 'open' || filters.includeAll);
+  let items = ensureListings().filter(
+    (l) =>
+      (l.category || 'crop') === (filters.category || 'crop') &&
+      (l.status === 'open' || filters.includeAll),
+  );
   if (filters.crop) items = items.filter((l) => l.crop === filters.crop);
   if (filters.region) items = items.filter((l) => l.region === filters.region);
   if (filters.minPrice != null) items = items.filter((l) => l.askingPrice >= Number(filters.minPrice));
@@ -199,7 +203,11 @@ export function deleteListing(id) {
 }
 
 export function listBuyRequests(filters = {}) {
-  let items = ensureRequests().filter((r) => r.status === 'open' || filters.includeAll);
+  let items = ensureRequests().filter(
+    (r) =>
+      (r.category || 'crop') === (filters.category || 'crop') &&
+      (r.status === 'open' || filters.includeAll),
+  );
   if (filters.crop) items = items.filter((r) => r.crop === filters.crop);
   if (filters.region) items = items.filter((r) => r.region === filters.region);
   if (filters.ownerId || filters.ownerName) {

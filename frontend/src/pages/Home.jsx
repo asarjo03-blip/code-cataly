@@ -1,9 +1,8 @@
 import { Link, Navigate } from 'react-router-dom';
-import LanguageSwitcher from '../components/LanguageSwitcher.jsx';
-import { CheckIcon, LeafIcon, MarketsIcon } from '../components/Icons.jsx';
+import SettingsMenu from '../components/SettingsMenu.jsx';
+import { LeafIcon } from '../components/Icons.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
-import landingFarm from '../assets/landing-farm.svg';
 import logo from '../assets/logo.svg';
 import './Home.css';
 
@@ -16,7 +15,7 @@ export default function Home() {
   return (
     <section className="landing">
       <div className="landing__art" aria-hidden="true">
-        <img src={landingFarm} alt="" />
+        <img src="/images/gambian-rice-field.png" alt="" />
       </div>
 
       <div className="landing__top">
@@ -24,28 +23,22 @@ export default function Home() {
           <img src={logo} alt="" width="28" height="28" />
           {t('appName')}
         </p>
-        <LanguageSwitcher />
+        <SettingsMenu />
       </div>
 
       <div className="landing__copy fade-in">
         <h1>{t('tagline')}</h1>
-        <p>{t('taglineBody')}</p>
-        <ul className="landing__features">
-          <li>
-            <LeafIcon size={22} /> {t('featureFresh')}
-          </li>
-          <li>
-            <MarketsIcon size={22} /> {t('featureWholesale')}
-          </li>
-          <li>
-            <CheckIcon size={22} /> {t('featureTrusted')}
-          </li>
-        </ul>
+        <p className="landing__eyebrow">
+          <LeafIcon size={19} /> Fresh from Gambian farms
+        </p>
       </div>
 
       <div className="landing__actions fade-in">
         <Link to="/marketplace" className="btn btn-primary btn-block">
           {t('explore')}
+        </Link>
+        <Link to="/livestock" className="btn btn-outline btn-block">
+          {t('navLivestock')} &amp; poultry
         </Link>
         <Link to="/login" className="landing__signin">
           {t('signInOrJoin')}

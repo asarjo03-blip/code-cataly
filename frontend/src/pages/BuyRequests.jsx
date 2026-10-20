@@ -4,6 +4,7 @@ import { buyRequestApi } from '../api/services.js';
 import { getErrorMessage } from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
+import { useBackendRecovery } from '../hooks/useBackendRecovery.js';
 import {
   CROP_LABELS,
   REGION_LABELS,
@@ -18,6 +19,7 @@ import './Forms.css';
 
 export default function BuyRequests() {
   const { t } = useLanguage();
+  const backendRecovery = useBackendRecovery();
   const { user, isBuyer } = useAuth();
   const [tick, setTick] = useState(0);
   const [requests, setRequests] = useState([]);
@@ -47,7 +49,7 @@ export default function BuyRequests() {
     return () => {
       active = false;
     };
-  }, [tick]);
+  }, [tick, backendRecovery]);
 
   const set = (key, value) => setForm((prev) => ({ ...prev, [key]: value }));
 

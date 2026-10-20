@@ -1,5 +1,12 @@
 const PREFIX = 'agriconnect:';
 
+export function removeAppData() {
+  for (let index = localStorage.length - 1; index >= 0; index -= 1) {
+    const key = localStorage.key(index);
+    if (key?.startsWith(PREFIX)) localStorage.removeItem(key);
+  }
+}
+
 export function readJson(key, fallback) {
   try {
     const raw = localStorage.getItem(PREFIX + key);

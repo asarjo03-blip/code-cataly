@@ -6,6 +6,12 @@
   box-sizing: border-box;
 }
 
+*,
+*::before,
+*::after {
+  border-radius: 0 !important;
+}
+
 html {
   width: 100%;
   overflow-x: clip;
@@ -166,7 +172,7 @@ ul {
 
 .btn-green {
   background: var(--color-primary);
-  color: #fff;
+  color: var(--color-primary-contrast, #fff);
 }
 
 .btn-green:hover:not(:disabled) {
@@ -205,11 +211,13 @@ ul {
 .field select,
 .field textarea {
   width: 100%;
+  min-width: 0;
   min-height: var(--tap);
   padding: 0.75rem 1rem;
   border: 1.5px solid var(--color-border);
   border-radius: var(--radius-md);
   background: var(--color-surface);
+  font-size: 1rem;
   outline: none;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
@@ -224,12 +232,6 @@ ul {
 .field textarea:focus {
   border-color: var(--color-primary);
   box-shadow: 0 0 0 3px var(--color-primary-ring);
-}
-
-.field input,
-.field select,
-.field textarea {
-  min-width: 0;
 }
 
 .field-error {
@@ -367,68 +369,40 @@ ul {
 
 @media (min-width: 768px) {
   .app-shell__main {
-      max-width: 960px;
-      padding: var(--space-6) var(--space-6) calc(var(--nav-height) + var(--space-10));
-    }
-
-    :root {
-      --max-width: 40rem;
-    }
+    max-width: 960px;
+    padding: var(--space-6) var(--space-6) calc(var(--nav-height) + var(--space-10));
   }
 
-  @media (min-width: 1024px) {
-    .app-shell__main {
-      max-width: 1200px;
-      padding-left: var(--space-8);
-      padding-right: var(--space-8);
-    }
+  :root {
+    --max-width: 40rem;
+  }
+}
 
-    .form-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
+@media (min-width: 1024px) {
+  .app-shell__main {
+    max-width: 1200px;
+    padding-left: var(--space-8);
+    padding-right: var(--space-8);
+  }
+}
+
+@media (min-width: 1440px) {
+  .app-shell__main {
+    max-width: 1320px;
+  }
+}
+
+@media (max-width: 359px) {
+  .app-shell__main {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
   }
 
-  @media (min-width: 1440px) {
-    .app-shell__main {
-      max-width: 1320px;
-    }
+  .section-head {
+    align-items: flex-start;
   }
 
-  @media (max-width: 359px) {
-    .app-shell__main {
-      padding-left: 0.75rem;
-      padding-right: 0.75rem;
-    }
-
-    .section-head {
-      align-items: flex-start;
-    }
-
-    .section-link {
-      text-align: right;
-    }
-
-    .form-grid {
-      grid-template-columns: minmax(0, 1fr);
-      gap: 0;
-    }
-
-    .form-card {
-      padding: 0.9rem;
-    }
-
-    .bottom-nav__inner {
-      gap: 0;
-      padding: 0.45rem;
-    }
-
-    .bottom-nav__item {
-      font-size: 0.62rem;
-    }
-
-    .bottom-nav__cart {
-      width: 2.5rem;
-      height: 2.5rem;
-    }
+  .section-link {
+    text-align: right;
   }
 }

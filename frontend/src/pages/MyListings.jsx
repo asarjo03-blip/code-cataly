@@ -5,6 +5,7 @@ import { listingApi } from '../api/services.js';
 import { getErrorMessage } from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
+import { useBackendRecovery } from '../hooks/useBackendRecovery.js';
 import { CROP_LABELS, REGION_LABELS, formatCrop, formatGmd, formatRegion } from '../utils/format.js';
 import './Forms.css';
 
@@ -21,6 +22,7 @@ const emptyForm = {
 
 export default function MyListings() {
   const { t } = useLanguage();
+  const backendRecovery = useBackendRecovery();
   const { user } = useAuth();
   const [tick, setTick] = useState(0);
   const [mine, setMine] = useState([]);
@@ -48,7 +50,7 @@ export default function MyListings() {
     return () => {
       active = false;
     };
-  }, [user?.id, tick]);
+  }, [user?.id, tick, backendRecovery]);
 
   const set = (key, value) => setForm((prev) => ({ ...prev, [key]: value }));
 
@@ -179,7 +181,8 @@ export default function MyListings() {
                 {listing.unit}
               </h3>
               <p>
-                {formatGmd(listing.askingPrice)} · {listing.village || formatRegion(listing.region)} · {listing.status}
+                {formatGmd(listing.askingPrice)} · {listing.village || formatRegion(listing.region)} ·{' '}
+                {listing.status === 'sold' || Number(listing.quantity) <= 0 ? t('soldOut') : listing.status}
               </p>
             </div>
             <div className="list-item__actions">

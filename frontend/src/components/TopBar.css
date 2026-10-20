@@ -1,4 +1,6 @@
 .top-bar {
+  position: relative;
+  z-index: 2;
   margin-bottom: var(--space-4);
 }
 
@@ -28,6 +30,7 @@
   font-size: var(--text-xl);
   font-weight: 700;
   letter-spacing: -0.02em;
+  overflow-wrap: anywhere;
 }
 
 .top-bar__subtitle {
@@ -41,17 +44,6 @@
   display: flex;
   align-items: center;
   gap: 0.45rem;
-}
-
-.top-bar__bell {
-  width: 2.4rem;
-  height: 2.4rem;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  font-size: 0.95rem;
 }
 
 @media (max-width: 359px) {

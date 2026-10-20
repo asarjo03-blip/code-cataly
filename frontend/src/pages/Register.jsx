@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
-import LanguageSwitcher from '../components/LanguageSwitcher.jsx';
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import SettingsMenu from '../components/SettingsMenu.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import { CROP_LABELS, REGION_LABELS } from '../utils/format.js';
@@ -11,7 +11,9 @@ const CROPS = Object.keys(CROP_LABELS);
 export default function Register() {
   const { t } = useLanguage();
   const { register, error, setError, isAuthenticated, loading } = useAuth();
+  const location = useLocation();
   const navigate = useNavigate();
+  const allowAdditionalAccount = new URLSearchParams(location.search).get('addAccount') === '1';
   const [form, setForm] = useState({
     name: '',
     email: '',
@@ -27,7 +29,9 @@ export default function Register() {
   });
   const [submitting, setSubmitting] = useState(false);
 
-  if (!loading && isAuthenticated) return <Navigate to="/dashboard" replace />;
+  if (!loading && isAuthenticated && !allowAdditionalAccount) {
+    return <Navigate to="/dashboard" replace />;
+  }
 
   const set = (key, value) => setForm((prev) => ({ ...prev, [key]: value }));
 
@@ -65,7 +69,7 @@ export default function Register() {
           <Link to="/" className="auth-page__brand">
             AgriConnect
           </Link>
-          <LanguageSwitcher compact />
+          <SettingsMenu />
         </div>
         <h1>{t('register')}</h1>
         <form onSubmit={onSubmit}>

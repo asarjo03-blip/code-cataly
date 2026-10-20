@@ -8,12 +8,14 @@ import { dashboardApi } from '../api/services.js';
 import { getErrorMessage } from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
+import { useBackendRecovery } from '../hooks/useBackendRecovery.js';
 import { formatCrop, formatGmd, formatRegion, trendLabel } from '../utils/format.js';
 import './Dashboard.css';
 
 export default function Dashboard() {
   const { t } = useLanguage();
   const { user } = useAuth();
+  const backendRecovery = useBackendRecovery();
   const [data, setData] = useState(null);
   const [prices, setPrices] = useState([]);
   const [matches, setMatches] = useState([]);
@@ -26,7 +28,7 @@ export default function Dashboard() {
     async function load() {
       setLoading(true);
       try {
-        const dash = await dashboardApi.get();
+        const dash = await dashboardApi.get(user);
         if (!active) return;
         setData(dash.data);
         setPrices(dash.data?.prices || []);
@@ -42,7 +44,7 @@ export default function Dashboard() {
     return () => {
       active = false;
     };
-  }, [user?.crops, user?.region]);
+  }, [user, backendRecovery]);
 
   const weather = data?.weather?.current;
   const forecast = data?.weather?.forecast || [];

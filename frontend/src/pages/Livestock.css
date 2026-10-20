@@ -1,0 +1,266 @@
+.livestock-page {
+  display: grid;
+  gap: 1rem;
+}
+
+.livestock-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-bottom: 2px solid var(--color-border);
+}
+
+.livestock-tabs button {
+  min-height: var(--tap);
+  padding: 0.65rem;
+  color: var(--color-ink-muted);
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+
+.livestock-tabs button.is-active {
+  border-bottom: 3px solid var(--color-primary);
+  color: var(--color-primary-dark);
+}
+
+.livestock-panel {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.livestock-form {
+  margin: 0;
+}
+
+.livestock-form h2 {
+  margin-bottom: 1rem;
+  font-size: var(--text-lg);
+}
+
+.livestock-form__row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.livestock-market-list,
+.livestock-market-guide,
+.livestock-guide-grid {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.livestock-market-card,
+.livestock-market-guide__card,
+.livestock-guide-card,
+.livestock-vet {
+  min-width: 0;
+  padding: 0.9rem;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.livestock-market-card {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.livestock-market-card h3,
+.livestock-market-guide__card h3 {
+  font-size: var(--text-md);
+}
+
+.livestock-market-card p,
+.livestock-market-guide__card p,
+.livestock-vet p,
+.livestock-vet li {
+  margin-top: 0.35rem;
+  color: var(--color-ink-soft);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}
+
+.livestock-market-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.livestock-market-card__actions a {
+  min-height: var(--tap);
+  display: inline-flex;
+  align-items: center;
+  padding: 0.4rem 0.7rem;
+  border: 1px solid var(--color-border);
+  color: var(--color-primary-dark);
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+
+.livestock-market-card__contact {
+  color: var(--color-ink-muted);
+  font-size: var(--text-xs);
+}
+
+.livestock-market-guide__card strong {
+  display: block;
+  margin-top: 0.3rem;
+  color: var(--color-primary-dark);
+  font-size: var(--text-xs);
+}
+
+.livestock-guide-card h3 {
+  margin-top: 0.25rem;
+  font-size: var(--text-md);
+}
+
+.livestock-guide-card ul {
+  display: grid;
+  gap: 0.35rem;
+  margin-top: 0.5rem;
+}
+
+.livestock-guide-card li {
+  position: relative;
+  padding-left: 1rem;
+  color: var(--color-ink-soft);
+  font-size: var(--text-sm);
+  line-height: 1.45;
+}
+
+.livestock-guide-card li::before {
+  position: absolute;
+  left: 0;
+  content: "•";
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+.livestock-vet {
+  border-left: 4px solid var(--color-primary);
+}
+
+.livestock-vet h2 {
+  font-size: var(--text-lg);
+}
+
+.livestock-vet ul {
+  display: grid;
+  gap: 0.35rem;
+  margin-top: 0.6rem;
+}
+
+.livestock-vet li {
+  position: relative;
+  padding-left: 1rem;
+}
+
+.livestock-vet li::before {
+  position: absolute;
+  left: 0;
+  content: "•";
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+.livestock-intro {
+  padding: 1rem;
+  border: 1px solid var(--color-border);
+  background: var(--color-primary-soft);
+}
+
+.livestock-intro h2 {
+  font-size: var(--text-lg);
+}
+
+.livestock-intro p,
+.livestock-card > p:not(.livestock-card__type) {
+  margin-top: 0.45rem;
+  color: var(--color-ink-soft);
+  font-size: var(--text-sm);
+  line-height: 1.55;
+}
+
+.livestock-grid {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.livestock-card {
+  min-width: 0;
+  padding: 1rem;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-soft);
+}
+
+.livestock-card__type {
+  color: var(--color-primary-dark);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.livestock-card h2 {
+  margin-top: 0.25rem;
+  font-size: var(--text-lg);
+}
+
+.livestock-card h3 {
+  margin-top: 0.85rem;
+  font-size: var(--text-sm);
+}
+
+.livestock-card ul {
+  display: grid;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+}
+
+.livestock-card li {
+  position: relative;
+  padding-left: 1rem;
+  color: var(--color-ink-soft);
+  font-size: var(--text-sm);
+}
+
+.livestock-card li::before {
+  position: absolute;
+  left: 0;
+  content: "•";
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+.livestock-note {
+  padding: 0.85rem;
+  border-left: 3px solid var(--color-primary);
+  background: var(--color-surface);
+  color: var(--color-ink-muted);
+  font-size: var(--text-xs);
+}
+
+@media (min-width: 680px) {
+  .livestock-market-list,
+  .livestock-market-guide,
+  .livestock-guide-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .livestock-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .livestock-card:last-child {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (min-width: 1000px) {
+  .livestock-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .livestock-card:last-child {
+    grid-column: auto;
+  }
+}

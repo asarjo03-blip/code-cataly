@@ -1,3 +1,15 @@
 .admin-page .chip-row {
   margin-bottom: 1rem;
 }
+
+.admin-page .form-card {
+  width: 100%;
+  max-width: 48rem;
+  margin-inline: auto;
+}
+
+@media (max-width: 359px) {
+  .admin-page .chip {
+    padding-inline: 0.7rem;
+  }
+}

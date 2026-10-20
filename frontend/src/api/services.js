@@ -1,6 +1,13 @@
-import api, { withDemoFallback } from './client.js';
+import api, { hasDemoSession, withDemoFallback } from './client.js';
 import { searchAdvisories, getAdvisory, saveAdvisory } from '../data/advisories.js';
 import { currentActivities, getCropCalendar } from '../data/calendar.js';
+import {
+  listDemoUsers,
+  loginDemoUser,
+  registerDemoUser,
+  updateDemoProfile,
+  updateDemoRole,
+} from '../data/demoUsers.js';
 import { getLatestPrices, getMarket, MARKETS, priceHistorySeries } from '../data/markets.js';
 import {
   deleteListing as deleteLocalListing,
@@ -35,6 +42,14 @@ function getDemoPrices(filters = {}) {
     .sort((a, b) => b.pricePerKg - a.pricePerKg);
 }
 
+function applyDemoListingPrivacy(listing) {
+  const owner = listDemoUsers().find((user) => user.id === listing.ownerId);
+  if (owner?.privacy?.showPhoneOnListings === false) {
+    return { ...listing, farmerPhone: '' };
+  }
+  return listing;
+}
+
 function getDemoCompare(crop) {
   const rows = getDemoPrices({ crop });
   const best = rows[0];
@@ -54,45 +69,211 @@ function getDemoAdvisories({ crop, category, q } = {}) {
   return searchAdvisories({ crop, category, q });
 }
 
+function getDemoWeather(region) {
+  const today = new Date();
+  const isRainySeason = today.getMonth() >= 5 && today.getMonth() <= 9;
+  return {
+    source: 'demo',
+    location: { region },
+    season: {
+      season: isRainySeason ? 'rainy' : 'dry',
+      phase: isRainySeason ? 'late' : 'dry',
+    },
+    current: {
+      tempC: isRainySeason ? 29 : 33,
+      rainMm: 0,
+      condition: isRainySeason ? 'Partly cloudy' : 'Sunny',
+    },
+    forecast: Array.from({ length: 5 }, (_, index) => {
+      const date = new Date(today);
+      date.setDate(today.getDate() + index + 1);
+      return {
+        date: date.toISOString().slice(0, 10),
+        label: date.toLocaleDateString(undefined, { weekday: 'short' }),
+        tempC: (isRainySeason ? 29 : 33) + (index % 2),
+        rainMm: isRainySeason && index === 2 ? 4 : 0,
+      };
+    }),
+    alerts: [],
+  };
+}
+
+function getDemoMatches(user, crops) {
+  if (!user || !['farmer', 'vendor'].includes(user.role)) return [];
+  const listings = listListings();
+  const requests = listBuyRequests();
+  const pairs = [];
+
+  if (user.role === 'farmer') {
+    const availableListings = listings.filter((listing) => listing.ownerId === user.id);
+    const listingPool = availableListings.length ? availableListings : listings;
+    for (const request of requests) {
+      if (crops.length && !crops.includes(request.crop)) continue;
+      const listing = listingPool.find(
+        (item) => item.crop === request.crop && (item.unit || 'kg') === (request.unit || 'kg'),
+      );
+      if (listing) pairs.push({ listing, request });
+    }
+  } else {
+    const ownedRequests = requests.filter((item) => item.ownerId === user.id);
+    const requestPool = ownedRequests.length ? ownedRequests : requests;
+    for (const request of requestPool) {
+      if (crops.length && !crops.includes(request.crop)) continue;
+      const listing = listings.find(
+        (item) => item.crop === request.crop && (item.unit || 'kg') === (request.unit || 'kg'),
+      );
+      if (listing) pairs.push({ listing, request });
+    }
+  }
+
+  return pairs.slice(0, 5).map(({ listing, request }, index) => ({
+    score: 75 - index,
+    crop: listing.crop,
+    listingId: listing.id,
+    requestId: request.id,
+    listing,
+    request,
+    reasons: ['Same crop and unit'],
+  }));
+}
+
+function getDemoDashboard(user) {
+  const crops = user?.crops || [];
+  const weather = getDemoWeather(user?.region);
+  const advisories = getDemoAdvisories()
+    .filter((item) => !item.crop || !crops.length || crops.includes(item.crop))
+    .slice(0, 6)
+    .map((item) => ({ ...item, priority: 'info' }));
+  const prices = getDemoPrices()
+    .filter((item) => !crops.length || crops.includes(item.crop))
+    .reduce((best, item) => {
+      if (!best.has(item.crop)) best.set(item.crop, item);
+      return best;
+    }, new Map());
+  const alerts = readJson('customAlerts', []).filter(
+    (alert) => !user?.region || alert.region === user.region,
+  );
+
+  return {
+    success: true,
+    data: {
+      farmer: user
+        ? {
+            name: user.name,
+            region: user.region,
+            village: user.village,
+            crops,
+            farmingType: user.farmingType,
+          }
+        : null,
+      user,
+      season: weather.season,
+      weather,
+      advice: advisories,
+      calendar: currentActivities(crops),
+      alerts,
+      prices: [...prices.values()].map((row) => ({
+        crop: row.crop,
+        bestMarket: row.market?.name,
+        marketId: row.marketId,
+        pricePerKg: row.pricePerKg,
+        trend: row.trend,
+      })),
+      matches: getDemoMatches(user, crops),
+      crops,
+      summary: {
+        alertCount: alerts.length,
+        urgentAdvice: 0,
+        trackedCrops: crops.length,
+      },
+    },
+  };
+}
+
 export const authApi = {
-  register: (body) => api.post('/auth/register', body).then((r) => r.data),
-  login: (body) => api.post('/auth/login', body).then((r) => r.data),
-  me: () => api.get('/auth/me').then((r) => r.data),
+  register: (body) =>
+    withDemoFallback(
+      () => api.post('/auth/register', body).then((response) => response.data),
+      () => registerDemoUser(body),
+    ),
+  login: (body) =>
+    withDemoFallback(
+      () => api.post('/auth/login', body).then((response) => response.data),
+      () => loginDemoUser(body),
+    ),
+  me: () =>
+    hasDemoSession()
+      ? Promise.resolve({ success: true, data: { user: readJson('user', null) } })
+      : withDemoFallback(
+          () => api.get('/auth/me').then((response) => response.data),
+          () => ({ success: true, data: { user: readJson('user', null) } }),
+        ),
 };
 
 export const userApi = {
-  getMe: () => api.get('/users/me').then((r) => r.data),
-  updateMe: (body) => api.patch('/users/me', body).then((r) => r.data),
-  listUsers: (params) => api.get('/users', { params }).then((r) => r.data),
-  updateRole: (id, role) => api.patch(`/users/${id}/role`, { role }).then((r) => r.data),
+  getMe: () =>
+    withDemoFallback(
+      () => api.get('/users/me').then((response) => response.data),
+      () => ({ success: true, data: { user: readJson('user', null) } }),
+    ),
+  updateMe: (body) =>
+    withDemoFallback(
+      () => api.patch('/users/me', body).then((response) => response.data),
+      () => {
+        const user = readJson('user', null);
+        if (!user) throw new Error('Sign in to update your profile');
+        const updatedUser = updateDemoProfile(user.id, body);
+        writeJson('user', updatedUser);
+        return { success: true, data: { user: updatedUser } };
+      },
+    ),
+  listUsers: (params) =>
+    withDemoFallback(
+      () => api.get('/users', { params }).then((response) => response.data),
+      () => {
+        let users = listDemoUsers();
+        if (params?.role) users = users.filter((user) => user.role === params.role);
+        if (params?.region) users = users.filter((user) => user.region === params.region);
+        return { success: true, data: { users } };
+      },
+    ),
+  updateRole: (id, role) =>
+    withDemoFallback(
+      () => api.patch(`/users/${id}/role`, { role }).then((response) => response.data),
+      () => ({ success: true, data: { user: updateDemoRole(id, role) } }),
+    ),
 };
 
 export const dashboardApi = {
-  get: () =>
+  get: (user = readJson('user', null)) =>
     withDemoFallback(
       () => api.get('/dashboard').then((response) => response.data),
-      () => ({
-        success: true,
-        data: {
-          weather: { current: null, forecast: [], alerts: [] },
-          advice: getDemoAdvisories().slice(0, 4).map((item) => ({
-            ...item,
-            priority: 'info',
-          })),
-          crops: [],
-          summary: { alertCount: 0, urgentAdvice: 0, trackedCrops: 0 },
-        },
-      }),
+      () => getDemoDashboard(user),
     ),
 };
 
 export const weatherApi = {
-  get: (params) => api.get('/weather', { params }).then((r) => r.data),
+  get: (params = {}) =>
+    withDemoFallback(
+      () => api.get('/weather', { params }).then((response) => response.data),
+      () => ({ success: true, data: getDemoWeather(params.region || readJson('user', null)?.region) }),
+    ),
 };
 
 export const adviceApi = {
-  get: (params) => api.get('/advice', { params }).then((r) => r.data),
-  crops: () => api.get('/advice/crops').then((r) => r.data),
+  get: (params = {}) =>
+    withDemoFallback(
+      () => api.get('/advice', { params }).then((response) => response.data),
+      () => ({
+        success: true,
+        data: getDemoAdvisories(params).map((item) => ({ ...item, priority: 'info' })),
+      }),
+    ),
+  crops: () =>
+    withDemoFallback(
+      () => api.get('/advice/crops').then((response) => response.data),
+      () => ({ success: true, data: [] }),
+    ),
 };
 
 export const marketApi = {
@@ -153,13 +334,14 @@ export const listingApi = {
           .then((response) => response.data),
       () => ({
         success: true,
-        data: listListings(params.mine ? { ...params, includeAll: true } : params),
+        data: listListings(params.mine ? { ...params, includeAll: true } : params)
+          .map((listing) => (params.mine ? listing : applyDemoListingPrivacy(listing))),
       }),
     ),
   get: (id) =>
     withDemoFallback(
       () => api.get(`/listings/${id}`).then((response) => response.data),
-      () => ({ success: true, data: getListing(id) }),
+      () => ({ success: true, data: applyDemoListingPrivacy(getListing(id)) }),
     ),
   create: (payload) =>
     withDemoFallback(
@@ -167,6 +349,7 @@ export const listingApi = {
       () => {
         const listing = {
           id: `lst-${Date.now()}`,
+          category: 'crop',
           status: 'open',
           availableFrom: new Date().toISOString().slice(0, 10),
           ...payload,
@@ -211,6 +394,7 @@ export const buyRequestApi = {
       () => {
         const request = {
           id: `br-${Date.now()}`,
+          category: 'crop',
           status: 'open',
           neededBy: new Date().toISOString().slice(0, 10),
           ...payload,
