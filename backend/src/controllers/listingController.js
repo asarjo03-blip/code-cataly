@@ -10,7 +10,7 @@ async function findListing(id) {
 }
 
 function filtersFrom(query) {
-  const filters = {};
+  const filters = { category: query.category === 'livestock' ? 'livestock' : 'crop' };
   if (query.crop) filters.crop = query.crop;
   if (query.region) filters.region = query.region;
   if (query.minPrice != null) filters.askingPrice = { ...filters.askingPrice, $gte: Number(query.minPrice) };
@@ -23,11 +23,19 @@ function filtersFrom(query) {
   return filters;
 }
 
+function serializePublicListing(listing) {
+  const data = listing.toJSON();
+  const owner = listing.owner;
+  if (owner?._id) data.ownerId = String(owner._id);
+  if (owner?.privacy?.showPhoneOnListings === false) data.farmerPhone = '';
+  return data;
+}
+
 export const listListings = asyncHandler(async (request, response) => {
   const filters = filtersFrom(request.query);
   filters.status = 'open';
-  const listings = await Listing.find(filters).sort({ createdAt: -1 }).limit(100);
-  response.json({ success: true, data: listings });
+  const listings = await Listing.find(filters).populate('owner', 'privacy').sort({ createdAt: -1 }).limit(100);
+  response.json({ success: true, data: listings.map(serializePublicListing) });
 });
 
 export const listMyListings = asyncHandler(async (request, response) => {
@@ -36,19 +44,20 @@ export const listMyListings = asyncHandler(async (request, response) => {
 });
 
 export const getListing = asyncHandler(async (request, response) => {
-  const listing = await findListing(request.params.id);
+  const listing = await findListing(request.params.id).then((item) => item?.populate('owner', 'privacy'));
   if (!listing || listing.status !== 'open') {
     throw new HttpError(404, 'Listing not found');
   }
-  response.json({ success: true, data: listing });
+  response.json({ success: true, data: serializePublicListing(listing) });
 });
 
 export const createListing = asyncHandler(async (request, response) => {
-  const { crop, quantity, unit, askingPrice, region, village, availableFrom, notes, image } = request.body;
+  const { category, crop, quantity, unit, askingPrice, region, village, availableFrom, notes, image } = request.body;
   const listing = await Listing.create({
     owner: request.user.id,
     farmerName: request.user.name,
     farmerPhone: request.user.phone,
+    category,
     crop,
     quantity,
     unit,
@@ -88,7 +97,10 @@ export const deleteListing = asyncHandler(async (request, response) => {
 });
 
 export const listBuyRequests = asyncHandler(async (request, response) => {
-  const filters = { status: 'open' };
+  const filters = {
+    status: 'open',
+    category: request.query.category === 'livestock' ? 'livestock' : 'crop',
+  };
   if (request.query.crop) filters.crop = request.query.crop;
   if (request.query.region) filters.region = request.query.region;
   const requests = await BuyRequest.find(filters).sort({ createdAt: -1 }).limit(100);
@@ -101,11 +113,12 @@ export const listMyBuyRequests = asyncHandler(async (request, response) => {
 });
 
 export const createBuyRequest = asyncHandler(async (request, response) => {
-  const { crop, quantity, unit, offerPrice, region, neededBy, notes } = request.body;
+  const { category, crop, quantity, unit, offerPrice, region, neededBy, notes } = request.body;
   const buyRequest = await BuyRequest.create({
     owner: request.user.id,
     buyerName: request.user.name,
     buyerPhone: request.user.phone,
+    category,
     crop,
     quantity,
     unit,

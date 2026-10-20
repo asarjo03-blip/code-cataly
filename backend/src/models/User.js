@@ -29,6 +29,9 @@ const userSchema = new mongoose.Schema(
     farmSizeHectares: { type: Number, min: 0, max: 1000 },
     farmingType: { type: String, enum: ['rainfed', 'irrigated'], default: 'rainfed' },
     language: { type: String, enum: LANGUAGES, default: 'en' },
+    privacy: {
+      showPhoneOnListings: { type: Boolean, default: true },
+    },
   },
   { timestamps: true },
 );

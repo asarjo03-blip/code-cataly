@@ -89,4 +89,4 @@ Both marketplace collections return `{ "success": true, "data": [...] }` for lis
 
 Run `npm run seed` to seed the demo markets, seven-day sample price histories, and advisories alongside demo users and marketplace records.
 
-When the API cannot be reached, the frontend falls back to browser-local sample marketplace data and shows an offline-demo banner. Writes made in this mode are stored only in that browser and are not uploaded automatically when the server returns.
+When the API cannot be reached, the frontend falls back to browser-local sample marketplace data. This fallback is not announced with a banner. Writes made in this mode are stored only in that browser and are not uploaded automatically when the server returns.

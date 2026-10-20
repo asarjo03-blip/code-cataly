@@ -15,6 +15,13 @@ export const updateMyProfile = asyncHandler(async (request, response) => {
       request.user[field] = request.body[field];
     }
   }
+  if (
+    request.body.privacy &&
+    typeof request.body.privacy === 'object' &&
+    typeof request.body.privacy.showPhoneOnListings === 'boolean'
+  ) {
+    request.user.set('privacy.showPhoneOnListings', request.body.privacy.showPhoneOnListings);
+  }
   await request.user.save();
   response.json({ success: true, data: { user: request.user.toJSON() } });
 });
