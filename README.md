@@ -28,7 +28,7 @@ The app uses `/api` on the same origin in production, so no frontend API URL or 
 The frontend includes `frontend/netlify.toml` with the Vite build settings and a rewrite for browser routes, so direct links such as `/marketplace` continue to work.
 
 1. Push the repository to a Git provider supported by Netlify and create a new site from the repository.
-2. In the Netlify build settings, set the base directory to `frontend` and the Netlify configuration file path to `frontend/netlify.toml`. The build command is `npm run build` and the publish directory is `dist`.
+2. In Netlify, leave the base directory at the repository root and set the configuration file path to `frontend/netlify.toml`. The build command is `npm run build` and the publish directory is `frontend/dist`.
 3. If deploying only the frontend without a reachable API, no environment variables are required; the app uses browser-local demo mode when the API is unavailable.
 4. To connect to a separately deployed backend, add `VITE_API_URL` in the Netlify site's environment variables with the backend API base URL, for example `https://your-backend.example.com/api`, then trigger a new deploy. The backend must allow requests from your Netlify site origin.
 5. Deploy and verify both the home page and a direct route such as `/marketplace`.
