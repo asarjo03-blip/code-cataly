@@ -50,6 +50,7 @@ export default function VoiceAssistant({ raised = false }) {
   const [replies, setReplies] = useState(() => readJson('voiceReplies', true));
   const repliesRef = useRef(replies);
   const bodyRef = useRef(null);
+  const conversationRef = useRef(null);
 
   useEffect(() => {
     repliesRef.current = replies;
@@ -63,10 +64,12 @@ export default function VoiceAssistant({ raised = false }) {
       setAnswer('');
       setResults([]);
       try {
-        const intent = interpret(clean, { user });
-        const resolved = await resolveIntent(intent, { language, user, t });
+        const context = conversationRef.current;
+        const intent = interpret(clean, { user, context });
+        const resolved = await resolveIntent(intent, { language, user, t, context });
         setAnswer(resolved.speech);
         setResults(resolved.results || []);
+        if (resolved.context) conversationRef.current = resolved.context;
         if (resolved.path) navigate(resolved.path);
         if (repliesRef.current) speakText(resolved.speech, language);
       } catch {
@@ -102,6 +105,7 @@ export default function VoiceAssistant({ raised = false }) {
     setHeard('');
     setAnswer('');
     setResults([]);
+    conversationRef.current = null;
     clearError();
   }, [clearError, stop]);
 
@@ -120,6 +124,7 @@ export default function VoiceAssistant({ raised = false }) {
     setHeard('');
     setAnswer('');
     setResults([]);
+    conversationRef.current = null;
     clearError();
     if (supported) start();
   };

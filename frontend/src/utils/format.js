@@ -21,6 +21,18 @@ export const CROP_LABELS = {
   cabbage: 'Cabbage',
   mango: 'Mango',
   cashew: 'Cashew',
+  okra: 'Okra',
+  pepper: 'Chilli pepper',
+  sweet_potato: 'Sweet potato',
+  sesame: 'Sesame',
+  cowpea: 'Cowpea',
+  watermelon: 'Watermelon',
+  papaya: 'Papaya',
+  banana: 'Banana',
+  lime: 'Lime',
+  cucumber: 'Cucumber',
+  moringa: 'Moringa',
+  tiger_nut: 'Tiger nut',
 };
 
 export const ROLE_LABELS = {

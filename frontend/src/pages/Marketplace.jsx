@@ -14,12 +14,7 @@ import './Marketplace.css';
 
 const CATEGORIES = [
   { id: 'all', label: 'All' },
-  { id: 'groundnut', label: 'Groundnut' },
-  { id: 'onion', label: 'Onion' },
-  { id: 'tomato', label: 'Tomato' },
-  { id: 'mango', label: 'Mango' },
-  { id: 'rice', label: 'Rice' },
-  { id: 'millet', label: 'Millet' },
+  ...Object.entries(CROP_LABELS).map(([id, label]) => ({ id, label })),
 ];
 
 export default function Marketplace() {

@@ -54,6 +54,62 @@ export const CROP_CALENDAR = {
     { activity: 'weed', startMonth: 7, endMonth: 8, notes: 'Early thinning and weeding.' },
     { activity: 'harvest', startMonth: 9, endMonth: 11, notes: 'Watch birds at grain fill.' },
   ],
+  okra: [
+    { activity: 'plant', startMonth: 6, endMonth: 8, notes: 'Sow with the rains, or under irrigation from October.' },
+    { activity: 'weed', startMonth: 7, endMonth: 9, notes: 'Keep beds clean and mulch to hold moisture.' },
+    { activity: 'harvest', startMonth: 7, endMonth: 11, notes: 'Pick tender pods every two to three days.' },
+  ],
+  pepper: [
+    { activity: 'plant', startMonth: 10, endMonth: 1, notes: 'Raise nursery, then transplant to irrigated beds.' },
+    { activity: 'weed', startMonth: 11, endMonth: 3, notes: 'Mulch and keep beds weed-free.' },
+    { activity: 'harvest', startMonth: 1, endMonth: 5, notes: 'Pick green or red depending on market.' },
+  ],
+  sweet_potato: [
+    { activity: 'plant', startMonth: 6, endMonth: 8, notes: 'Plant vines on ridges early in the rains.' },
+    { activity: 'weed', startMonth: 7, endMonth: 9, notes: 'Weed until vines cover the ground.' },
+    { activity: 'harvest', startMonth: 10, endMonth: 12, notes: 'Lift from about three months.' },
+  ],
+  sesame: [
+    { activity: 'plant', startMonth: 6, endMonth: 7, notes: 'Sow on well-drained soil with the early rains.' },
+    { activity: 'weed', startMonth: 7, endMonth: 8, notes: 'Thin and weed within the first three weeks.' },
+    { activity: 'harvest', startMonth: 9, endMonth: 10, notes: 'Cut before capsules shatter.' },
+  ],
+  cowpea: [
+    { activity: 'plant', startMonth: 6, endMonth: 7, notes: 'Sow with the rains at recommended spacing.' },
+    { activity: 'weed', startMonth: 7, endMonth: 8, notes: 'Keep young plants weed-free.' },
+    { activity: 'harvest', startMonth: 9, endMonth: 10, notes: 'Pick mature pods and dry well.' },
+  ],
+  watermelon: [
+    { activity: 'plant', startMonth: 11, endMonth: 1, notes: 'Plant irrigated dry-season beds.' },
+    { activity: 'weed', startMonth: 12, endMonth: 2, notes: 'Keep beds clean and mulched.' },
+    { activity: 'harvest', startMonth: 2, endMonth: 4, notes: 'Reduce watering as fruit ripens.' },
+  ],
+  papaya: [
+    { activity: 'plant', startMonth: 6, endMonth: 8, notes: 'Establish seedlings on well-drained mounds.' },
+    { activity: 'harvest', startMonth: 1, endMonth: 12, notes: 'Harvest fruit as it colours.' },
+  ],
+  banana: [
+    { activity: 'plant', startMonth: 6, endMonth: 8, notes: 'Plant suckers with the rains.' },
+    { activity: 'harvest', startMonth: 1, endMonth: 12, notes: 'Cut bunches when fruit fills.' },
+  ],
+  lime: [
+    { activity: 'plant', startMonth: 6, endMonth: 8, notes: 'Plant young trees at the start of the rains.' },
+    { activity: 'harvest', startMonth: 1, endMonth: 12, notes: 'Pick fruit as needed.' },
+  ],
+  cucumber: [
+    { activity: 'plant', startMonth: 10, endMonth: 1, notes: 'Plant irrigated beds, preferably on trellis.' },
+    { activity: 'weed', startMonth: 11, endMonth: 2, notes: 'Keep beds clean and water at the base.' },
+    { activity: 'harvest', startMonth: 12, endMonth: 3, notes: 'Pick young fruit every few days.' },
+  ],
+  moringa: [
+    { activity: 'plant', startMonth: 6, endMonth: 8, notes: 'Direct sow or transplant with the rains.' },
+    { activity: 'harvest', startMonth: 1, endMonth: 12, notes: 'Cut young shoots for leaf harvest.' },
+  ],
+  tiger_nut: [
+    { activity: 'plant', startMonth: 6, endMonth: 7, notes: 'Plant tubers early in the rains.' },
+    { activity: 'weed', startMonth: 7, endMonth: 9, notes: 'Keep the crop weed-free while young.' },
+    { activity: 'harvest', startMonth: 11, endMonth: 12, notes: 'Lift tubers after the rains.' },
+  ],
 };
 
 export const ACTIVITY_LABELS = {

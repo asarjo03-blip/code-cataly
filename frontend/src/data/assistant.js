@@ -6,6 +6,7 @@ import {
   monthInWindow,
 } from './calendar.js';
 import { MARKETS } from './markets.js';
+import { buildFarmAdvice, classifyFarmQuestion, farmAdviceSuggestions } from './farmAdvice.js';
 import { advisoryApi, buyRequestApi, listingApi, marketApi, weatherApi } from '../api/services.js';
 import { formatCrop, formatGmd, formatRegion } from '../utils/format.js';
 
@@ -17,7 +18,7 @@ import { formatCrop, formatGmd, formatRegion } from '../utils/format.js';
  */
 
 const CROP_TERMS = {
-  groundnut: ['groundnut', 'groundnuts', 'ground nut', 'peanut', 'peanuts', 'tia', 'tiya', 'gerte', 'bademba'],
+  groundnut: ['groundnut', 'groundnuts', 'ground nut', 'ground nuts', 'grandnut', 'grandnuts', 'granut', 'peanut', 'peanuts', 'tia', 'tiya', 'gerte', 'bademba'],
   rice: ['rice', 'paddy', 'malo', 'maloo', 'maalo', 'cees'],
   millet: ['millet', 'duro', 'duroo', 'dugub', 'petit mil'],
   maize: ['maize', 'corn', 'nyo', 'mbay', 'mais'],
@@ -28,6 +29,18 @@ const CROP_TERMS = {
   cabbage: ['cabbage', 'cabbages', 'shu', 'chou'],
   mango: ['mango', 'mangoes', 'mangoro'],
   cashew: ['cashew', 'cashews', 'kaju'],
+  okra: ['okra', 'okro', 'okras', 'kanja', 'kanjoo'],
+  pepper: ['pepper', 'peppers', 'chilli', 'chili', 'chillies', 'chilies', 'pepperoni', 'ata', 'kaani'],
+  sweet_potato: ['sweet potato', 'sweet potatoes', 'sweet-potato', 'potato', 'potatoes', 'batata', 'patata'],
+  sesame: ['sesame', 'beniseed', 'benni', 'simsim', 'til', 'sesam'],
+  cowpea: ['cowpea', 'cowpeas', 'black eyed pea', 'black-eyed pea', 'niebe', 'niaabe', 'waandu'],
+  watermelon: ['watermelon', 'watermelons', 'melon', 'melons', 'water melon'],
+  papaya: ['papaya', 'papayas', 'pawpaw', 'paw paw', 'papaaya'],
+  banana: ['banana', 'bananas', 'plantain', 'plantains'],
+  lime: ['lime', 'limes', 'limu', 'citrus'],
+  cucumber: ['cucumber', 'cucumbers', 'cucumba', 'concombre'],
+  moringa: ['moringa', 'moringa oleifera', 'drumstick tree', 'never die', 'benzolive'],
+  tiger_nut: ['tiger nut', 'tiger nuts', 'tigernut', 'tigernuts', 'chufa', 'deta', 'detaa', 'aya'],
 };
 
 const ANIMAL_TERMS = {
@@ -65,6 +78,14 @@ const MARKET_TERMS = {
   farafenni: ['farafenni'],
   basse: ['basse', 'basse santa su'],
   soma: ['soma'],
+  kerewan: ['kerewan'],
+  kuntaur: ['kuntaur'],
+  janjanbureh: ['janjanbureh', 'georgetown'],
+  mansakonko: ['mansakonko'],
+  banjul: ['banjul'],
+  gunjur: ['gunjur'],
+  fatoto: ['fatoto'],
+  essau: ['essau'],
 };
 
 const CATEGORY_TERMS = {
@@ -356,11 +377,12 @@ const SPEECH = {
 };
 
 const SUGGESTIONS = [
-  { query: 'find groundnut', labels: { en: 'Find groundnut', mnk: 'Groundnut nini', wo: 'Seet gerte' } },
+  { query: 'should I plant groundnut now or wait for rain', labels: { en: 'Plant groundnut now?', mnk: 'Groundnut plant saayiŋ?', wo: 'Plant gerte leegi?' } },
+  { query: 'what should I do on my farm this week', labels: { en: 'What should I do this week?', mnk: 'Bii biriki, m muŋ ke?', wo: 'Lan la def ayib bii?' } },
+  { query: 'my tomato leaves are turning yellow', labels: { en: 'Tomato leaves yellow?', mnk: 'Tomato ñaamee yelo?', wo: 'Xob tamaate yelloo?' } },
   { query: 'price of rice', labels: { en: 'Price of rice', mnk: 'Rice songo', wo: 'Prix maalo' } },
-  { query: 'advice for tomato', labels: { en: 'Advice for tomato', mnk: 'Tomato yaamaroo', wo: 'Xelal tamaate' } },
   { query: 'weather today', labels: { en: 'Weather today', mnk: 'Bii waati', wo: 'Taw tey' } },
-  { query: 'livestock for sale', labels: { en: 'Livestock for sale', mnk: 'Soo waafoolu', wo: 'Jaay maggal' } },
+  { query: 'find groundnut', labels: { en: 'Find groundnut', mnk: 'Groundnut nini', wo: 'Seet gerte' } },
   { query: 'where can I sell groundnut', labels: { en: 'Where to sell groundnut', mnk: 'Groundnut jaay dulaa', wo: 'Fan la jaay gerte' } },
 ];
 
@@ -498,7 +520,7 @@ function byPriceDesc(a, b) {
   return Number(b.pricePerKg ?? b.askingPrice ?? b.offerPrice) - Number(a.pricePerKg ?? a.askingPrice ?? a.offerPrice);
 }
 
-export function interpret(input, { user = null } = {}) {
+export function interpret(input, { user = null, context = null } = {}) {
   const text = normalize(input);
   const crop = findKey(CROP_TERMS, text);
   const animal = findKey(ANIMAL_TERMS, text);
@@ -533,6 +555,7 @@ export function interpret(input, { user = null } = {}) {
     wantsBuy,
     wantsLivestock,
     user,
+    context,
   };
 
   if (isHelp) return { ...base, kind: 'help' };
@@ -540,6 +563,18 @@ export function interpret(input, { user = null } = {}) {
   if (openPage) {
     if (openPage === 'markets' && (marketId || region)) return { ...base, kind: 'markets' };
     return { ...base, kind: 'navigate', page: openPage };
+  }
+
+  // Conversational farm advice comes before weather and calendar so that
+  // "should I plant now or wait for rain?" gets a direct recommendation.
+  const farmQuestion = classifyFarmQuestion(text, { crop, context });
+  if (farmQuestion) {
+    return {
+      ...base,
+      crop: farmQuestion.crop || crop,
+      kind: 'farmAdvice',
+      farm: farmQuestion,
+    };
   }
 
   if (hasTerm(text, WEATHER_TERMS)) return { ...base, kind: 'weather' };
@@ -1171,7 +1206,25 @@ async function resolveSell(intent, language, user, t) {
   };
 }
 
-export async function resolveIntent(intent, { language = 'en', user = null, t = null } = {}) {
+async function resolveFarmAdvice(intent, language, user, context) {
+  const region = intent.region || user?.region || undefined;
+  let weather = null;
+  try {
+    const { data } = await weatherApi.get(region ? { region } : {});
+    weather = data;
+  } catch {
+    weather = null;
+  }
+  return buildFarmAdvice({
+    question: intent.farm,
+    crop: intent.crop,
+    weather,
+    user,
+    context,
+  });
+}
+
+export async function resolveIntent(intent, { language = 'en', user = null, t = null, context = null } = {}) {
   try {
     switch (intent.kind) {
       case 'greeting':
@@ -1189,6 +1242,8 @@ export async function resolveIntent(intent, { language = 'en', user = null, t = 
         return await resolveLivestock(intent, language, user);
       case 'advice':
         return await resolveAdvice(intent, language);
+      case 'farmAdvice':
+        return await resolveFarmAdvice(intent, language, user, context);
       case 'calendar':
         return await resolveCalendar(intent, language, user, t);
       case 'markets':
@@ -1213,6 +1268,8 @@ export function assistantSuggestions(language = 'en', user = null) {
   const crop = crops[0];
   const role = user?.role;
 
+  entries.push(...farmAdviceSuggestions(language, user));
+
   if (crop) {
     const cropLabel = formatCrop(crop);
     entries.push({
@@ -1226,14 +1283,6 @@ export function assistantSuggestions(language = 'en', user = null) {
           en: `Where to sell ${cropLabel}`,
           mnk: `${cropLabel} jaay dulaa`,
           wo: `Fan la jaay ${cropLabel}`,
-        },
-      });
-      entries.push({
-        query: `when to harvest ${crop}`,
-        labels: {
-          en: `When to harvest ${cropLabel}`,
-          mnk: `${cropLabel} kati waati`,
-          wo: `Kañ la ñor ${cropLabel}`,
         },
       });
     }

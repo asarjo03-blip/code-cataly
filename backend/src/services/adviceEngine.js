@@ -51,7 +51,7 @@ function cropAdvice(crop, context) {
     }
   }
 
-  if (['onion', 'tomato', 'cabbage'].includes(crop.slug)) {
+  if (['onion', 'tomato', 'cabbage', 'okra', 'pepper', 'watermelon', 'cucumber'].includes(crop.slug)) {
     if (season === 'dry') {
       items.push({
         title: `Irrigate ${crop.name.toLowerCase()} in the cool hours`,
@@ -81,6 +81,70 @@ function cropAdvice(crop, context) {
     items.push({
       title: 'Keep firebreaks around cashew orchards',
       body: 'Clear undergrowth before the hottest months. Bush fires are a leading cause of orchard loss in the dry season.',
+      priority: 'urgent',
+    });
+  }
+
+  if (crop.slug === 'sesame') {
+    if (phase === 'late' || phase === 'harvest') {
+      items.push({
+        title: 'Harvest sesame before capsules shatter',
+        body: 'Cut and bundle plants when the lower capsules turn brown, then dry on a tarpaulin. Shaking loses seed quickly.',
+        priority: 'urgent',
+      });
+    } else {
+      items.push({
+        title: 'Keep sesame weed-free early',
+        body: 'Sesame is a weak early competitor. Thin to the recommended spacing and weed within the first three weeks.',
+        priority: 'seasonal',
+      });
+    }
+  }
+
+  if (crop.slug === 'cowpea') {
+    items.push({
+      title: 'Dry cowpea well and protect it from bruchids',
+      body: 'Harvest mature pods promptly, dry to low moisture, and store in clean sealed containers. Inspect monthly for weevil holes.',
+      priority: phase === 'late' || phase === 'harvest' ? 'urgent' : 'seasonal',
+    });
+  }
+
+  if (crop.slug === 'sweet_potato') {
+    items.push({
+      title: phase === 'harvest' || phase === 'late' ? 'Lift sweet potato before the soil hardens' : 'Plant sweet potato vines on ridges',
+      body: 'Ridges reduce waterlogging and make lifting easier. Harvest from about three months, starting with the largest roots.',
+      priority: phase === 'harvest' || phase === 'late' ? 'urgent' : 'seasonal',
+    });
+  }
+
+  if (['papaya', 'banana', 'lime', 'moringa'].includes(crop.slug) && season === 'dry') {
+    items.push({
+      title: `Water young ${crop.name.toLowerCase()} trees through the dry season`,
+      body: 'Deep watering once or twice a week keeps young trees alive. Mulch the base but keep mulch clear of the trunk.',
+      priority: 'seasonal',
+    });
+  }
+
+  if (crop.slug === 'papaya' && season === 'rainy') {
+    items.push({
+      title: 'Check papaya drainage in heavy rain',
+      body: 'Papaya roots rot in standing water. Keep planting holes and beds free-draining and stake plants that lean after wind.',
+      priority: 'urgent',
+    });
+  }
+
+  if (crop.slug === 'banana') {
+    items.push({
+      title: 'Remove banana suckers and prop heavy bunches',
+      body: 'Keep two or three strong suckers per mat. Prop bunches before they pull the stem over, and chop old stems for mulch.',
+      priority: 'seasonal',
+    });
+  }
+
+  if (crop.slug === 'tiger_nut' && (phase === 'late' || phase === 'harvest')) {
+    items.push({
+      title: 'Lift tiger nut after the rains',
+      body: 'Loosen the soil and lift tubers when tops begin to die back. Wash, sort out damaged tubers, and dry before sale.',
       priority: 'urgent',
     });
   }
