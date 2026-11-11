@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import CropArt from '../components/CropArt.jsx';
 import ProduceCard from '../components/ProduceCard.jsx';
 import { SearchIcon } from '../components/Icons.jsx';
@@ -26,13 +26,31 @@ export default function Marketplace() {
   const { t } = useLanguage();
   const backendRecovery = useBackendRecovery();
   const { isFarmer, isBuyer, isAuthenticated } = useAuth();
-  const [q, setQ] = useState('');
-  const [crop, setCrop] = useState('all');
-  const [region, setRegion] = useState('');
-  const [maxPrice, setMaxPrice] = useState('');
+  const [searchParams] = useSearchParams();
+  const paramsKey = searchParams.toString();
+  const [q, setQ] = useState(() => searchParams.get('q') || '');
+  const [crop, setCrop] = useState(() => {
+    const value = searchParams.get('crop');
+    return value && CROP_LABELS[value] ? value : 'all';
+  });
+  const [region, setRegion] = useState(() => {
+    const value = searchParams.get('region');
+    return value && REGION_LABELS[value] ? value : '';
+  });
+  const [maxPrice, setMaxPrice] = useState(() => searchParams.get('maxPrice') || '');
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    const params = new URLSearchParams(paramsKey);
+    const nextCrop = params.get('crop');
+    const nextRegion = params.get('region');
+    setQ(params.get('q') || '');
+    setCrop(nextCrop && CROP_LABELS[nextCrop] ? nextCrop : 'all');
+    setRegion(nextRegion && REGION_LABELS[nextRegion] ? nextRegion : '');
+    setMaxPrice(params.get('maxPrice') || '');
+  }, [paramsKey]);
 
   useEffect(() => {
     let active = true;

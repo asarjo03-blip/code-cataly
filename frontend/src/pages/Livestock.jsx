@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import TopBar from '../components/TopBar.jsx';
 import { buyRequestApi, listingApi } from '../api/services.js';
 import { getErrorMessage } from '../api/client.js';
@@ -68,7 +68,17 @@ const initialForm = {
 export default function Livestock() {
   const backendRecovery = useBackendRecovery();
   const { user, isFarmer, isBuyer, isAdmin } = useAuth();
-  const [view, setView] = useState('buy');
+  const [searchParams] = useSearchParams();
+  const paramsKey = searchParams.toString();
+  const [view, setView] = useState(() => (searchParams.get('view') === 'sell' ? 'sell' : 'buy'));
+  const [animal, setAnimal] = useState(() => {
+    const value = searchParams.get('animal');
+    return value && ANIMAL_LABELS[value] ? value : 'all';
+  });
+  const [region, setRegion] = useState(() => {
+    const value = searchParams.get('region');
+    return value && REGION_LABELS[value] ? value : 'all';
+  });
   const [tick, setTick] = useState(0);
   const [listings, setListings] = useState([]);
   const [requests, setRequests] = useState([]);
@@ -88,6 +98,38 @@ export default function Livestock() {
   });
   const canSell = isFarmer || isAdmin;
   const canBuy = isBuyer || isAdmin;
+
+  useEffect(() => {
+    const params = new URLSearchParams(paramsKey);
+    setView(params.get('view') === 'sell' ? 'sell' : 'buy');
+    const nextAnimal = params.get('animal');
+    if (nextAnimal && ANIMAL_LABELS[nextAnimal]) {
+      setAnimal(nextAnimal);
+      setSaleForm((current) => ({ ...current, animal: nextAnimal }));
+      setBuyForm((current) => ({ ...current, animal: nextAnimal }));
+    } else {
+      setAnimal('all');
+    }
+    const nextRegion = params.get('region');
+    if (nextRegion && REGION_LABELS[nextRegion]) {
+      setRegion(nextRegion);
+      setSaleForm((current) => ({ ...current, region: nextRegion }));
+      setBuyForm((current) => ({ ...current, region: nextRegion }));
+    } else {
+      setRegion('all');
+    }
+  }, [paramsKey]);
+
+  const visibleListings = listings.filter(
+    (item) =>
+      (animal === 'all' || item.crop === animal) &&
+      (region === 'all' || item.region === region),
+  );
+  const visibleRequests = requests.filter(
+    (item) =>
+      (animal === 'all' || item.crop === animal) &&
+      (region === 'all' || item.region === region),
+  );
 
   useEffect(() => {
     let active = true;
@@ -207,6 +249,46 @@ export default function Livestock() {
         </button>
       </div>
 
+      <div className="chip-row" style={{ marginTop: '0.75rem' }} role="group" aria-label="Filter by animal">
+        <button
+          type="button"
+          className={`chip ${animal === 'all' ? 'chip--active' : ''}`}
+          onClick={() => setAnimal('all')}
+        >
+          All animals
+        </button>
+        {ANIMALS.map((item) => (
+          <button
+            key={item.id}
+            type="button"
+            className={`chip ${animal === item.id ? 'chip--active' : ''}`}
+            onClick={() => setAnimal(item.id)}
+          >
+            {item.label}
+          </button>
+        ))}
+      </div>
+
+      <div className="chip-row" role="group" aria-label="Filter by region">
+        <button
+          type="button"
+          className={`chip ${region === 'all' ? 'chip--active' : ''}`}
+          onClick={() => setRegion('all')}
+        >
+          All regions
+        </button>
+        {Object.entries(REGION_LABELS).map(([value, label]) => (
+          <button
+            key={value}
+            type="button"
+            className={`chip ${region === value ? 'chip--active' : ''}`}
+            onClick={() => setRegion(value)}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
       {view === 'buy' ? (
         <section id="livestock-buy-panel" role="tabpanel" aria-labelledby="livestock-buy-tab" className="livestock-panel">
           {canBuy ? (
@@ -224,9 +306,9 @@ export default function Livestock() {
           )}
           <div className="section-head"><h2>Livestock for sale</h2></div>
           {loading ? <p className="page-subtitle">Loading livestock offers…</p> : null}
-          {!loading && !listings.length ? <p className="page-subtitle">No livestock sale listings yet.</p> : null}
+          {!loading && !visibleListings.length ? <p className="page-subtitle">No livestock sale listings yet.</p> : null}
           <div className="livestock-market-list">
-            {listings.map((listing) => (
+            {visibleListings.map((listing) => (
               <article className="livestock-market-card" key={listing.id}>
                 <div>
                   <h3>{ANIMAL_LABELS[listing.crop] || listing.crop} · {listing.quantity} head</h3>
@@ -261,9 +343,9 @@ export default function Livestock() {
           )}
           <div className="section-head"><h2>Livestock buyers are looking for</h2></div>
           {loading ? <p className="page-subtitle">Loading livestock requests…</p> : null}
-          {!loading && !requests.length ? <p className="page-subtitle">No livestock buy requests yet.</p> : null}
+          {!loading && !visibleRequests.length ? <p className="page-subtitle">No livestock buy requests yet.</p> : null}
           <div className="livestock-market-list">
-            {requests.map((request) => (
+            {visibleRequests.map((request) => (
               <article className="livestock-market-card" key={request.id}>
                 <div>
                   <h3>{ANIMAL_LABELS[request.crop] || request.crop} · {request.quantity} head wanted</h3>

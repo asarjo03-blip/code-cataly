@@ -202,6 +202,33 @@ export const CheckIcon = (props) => (
   </Svg>
 );
 
+export const MicIcon = (props) => (
+  <Svg {...props}>
+    <rect x="9" y="3" width="6" height="11" rx="3" stroke="currentColor" strokeWidth="1.8"/>
+    <path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3M9 21h6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+  </Svg>
+);
+
+export const CloseIcon = (props) => (
+  <Svg {...props}>
+    <path d="M6 6l12 12M18 6 6 18" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+  </Svg>
+);
+
+export const VolumeOnIcon = (props) => (
+  <Svg {...props}>
+    <path d="M4 9h3l4-3v12l-4-3H4V9z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round"/>
+    <path d="M15 8.5a5 5 0 0 1 0 7M17.5 6a8 8 0 0 1 0 12" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+  </Svg>
+);
+
+export const VolumeOffIcon = (props) => (
+  <Svg {...props}>
+    <path d="M4 9h3l4-3v12l-4-3H4V9z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round"/>
+    <path d="m15.5 9.5 5 5M20.5 9.5l-5 5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+  </Svg>
+);
+
 export function weatherIconFor(code, rainMm = 0) {
   if (rainMm >= 2 || [51, 53, 55, 61, 63, 65, 80, 81, 95, 96].includes(code)) return WeatherRainIcon;
   if ([2, 3, 45, 48].includes(code)) return WeatherCloudIcon;

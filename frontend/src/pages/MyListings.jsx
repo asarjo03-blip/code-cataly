@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import TopBar from '../components/TopBar.jsx';
 import { listingApi } from '../api/services.js';
 import { getErrorMessage } from '../api/client.js';
@@ -24,18 +24,39 @@ export default function MyListings() {
   const { t } = useLanguage();
   const backendRecovery = useBackendRecovery();
   const { user } = useAuth();
+  const [searchParams] = useSearchParams();
+  const paramsKey = searchParams.toString();
   const [tick, setTick] = useState(0);
   const [mine, setMine] = useState([]);
-  const [form, setForm] = useState({
-    ...emptyForm,
-    region: user?.region || 'north_bank',
-    village: user?.village || '',
-    crop: user?.crops?.[0] || 'groundnut',
+  const [form, setForm] = useState(() => {
+    const cropParam = searchParams.get('crop');
+    const regionParam = searchParams.get('region');
+    const priceParam = Number(searchParams.get('price'));
+    return {
+      ...emptyForm,
+      region: regionParam && REGION_LABELS[regionParam] ? regionParam : user?.region || 'north_bank',
+      village: user?.village || '',
+      crop: cropParam && CROP_LABELS[cropParam] ? cropParam : user?.crops?.[0] || 'groundnut',
+      askingPrice: priceParam > 0 ? priceParam : emptyForm.askingPrice,
+    };
   });
   const [editingId, setEditingId] = useState(null);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(paramsKey);
+    const cropParam = params.get('crop');
+    const regionParam = params.get('region');
+    const priceParam = Number(params.get('price'));
+    setForm((prev) => ({
+      ...prev,
+      crop: cropParam && CROP_LABELS[cropParam] ? cropParam : prev.crop,
+      region: regionParam && REGION_LABELS[regionParam] ? regionParam : prev.region,
+      askingPrice: priceParam > 0 ? priceParam : prev.askingPrice,
+    }));
+  }, [paramsKey]);
 
   useEffect(() => {
     let active = true;
@@ -70,7 +91,13 @@ export default function MyListings() {
     try {
       if (editingId) await listingApi.update(editingId, payload);
       else await listingApi.create(payload);
-      setForm({ ...emptyForm, region: user?.region || 'north_bank', village: user?.village || '' });
+      setForm((current) => ({
+        ...emptyForm,
+        region: user?.region || current.region || 'north_bank',
+        village: user?.village || '',
+        crop: current.crop,
+        askingPrice: current.askingPrice,
+      }));
       setEditingId(null);
       setMessage(editingId ? 'Listing updated.' : 'Listing posted.');
       setTick((n) => n + 1);

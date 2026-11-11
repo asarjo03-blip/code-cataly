@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import TopBar from '../components/TopBar.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
@@ -15,9 +16,24 @@ import './Calendar.css';
 export default function Calendar() {
   const { t } = useLanguage();
   const { user } = useAuth();
+  const [searchParams] = useSearchParams();
+  const paramsKey = searchParams.toString();
   const month = new Date().getMonth() + 1;
+  const requestedCrop = searchParams.get('crop');
   const cropOptions = user?.crops?.length ? user.crops : Object.keys(CROP_CALENDAR);
-  const [crop, setCrop] = useState(cropOptions[0] || 'groundnut');
+  const options =
+    requestedCrop && CROP_CALENDAR[requestedCrop] && !cropOptions.includes(requestedCrop)
+      ? [...cropOptions, requestedCrop]
+      : cropOptions;
+  const [crop, setCrop] = useState(() =>
+    requestedCrop && CROP_CALENDAR[requestedCrop] ? requestedCrop : cropOptions[0] || 'groundnut',
+  );
+
+  useEffect(() => {
+    const params = new URLSearchParams(paramsKey);
+    const value = params.get('crop');
+    if (value && CROP_CALENDAR[value]) setCrop(value);
+  }, [paramsKey]);
 
   const entries = useMemo(() => getCropCalendar(crop), [crop]);
 
@@ -26,7 +42,7 @@ export default function Calendar() {
       <TopBar title={t('calendar')} subtitle="Planting to harvest windows for your crops" />
 
       <div className="chip-row">
-        {cropOptions.map((c) => (
+        {options.map((c) => (
           <button
             key={c}
             type="button"

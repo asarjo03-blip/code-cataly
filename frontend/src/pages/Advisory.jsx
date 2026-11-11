@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import TopBar from '../components/TopBar.jsx';
 import { ADVISORY_CATEGORIES } from '../data/advisories.js';
 import { advisoryApi } from '../api/services.js';
@@ -12,12 +12,30 @@ import './Advisory.css';
 export default function Advisory() {
   const { t } = useLanguage();
   const backendRecovery = useBackendRecovery();
-  const [q, setQ] = useState('');
-  const [category, setCategory] = useState('all');
-  const [crop, setCrop] = useState('');
+  const [searchParams] = useSearchParams();
+  const paramsKey = searchParams.toString();
+  const categoryIds = ADVISORY_CATEGORIES.map((item) => item.id);
+  const [q, setQ] = useState(() => searchParams.get('q') || '');
+  const [category, setCategory] = useState(() => {
+    const value = searchParams.get('category');
+    return value && categoryIds.includes(value) ? value : 'all';
+  });
+  const [crop, setCrop] = useState(() => {
+    const value = searchParams.get('crop');
+    return value && CROP_LABELS[value] ? value : '';
+  });
   const [items, setItems] = useState([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const params = new URLSearchParams(paramsKey);
+    const nextCategory = params.get('category');
+    const nextCrop = params.get('crop');
+    setQ(params.get('q') || '');
+    setCategory(nextCategory && categoryIds.includes(nextCategory) ? nextCategory : 'all');
+    setCrop(nextCrop && CROP_LABELS[nextCrop] ? nextCrop : '');
+  }, [paramsKey]);
 
   useEffect(() => {
     let active = true;

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import PriceChart from '../components/PriceChart.jsx';
 import TopBar from '../components/TopBar.jsx';
 import { marketApi } from '../api/services.js';
@@ -10,12 +11,31 @@ import './Markets.css';
 export default function Markets() {
   const { t } = useLanguage();
   const backendRecovery = useBackendRecovery();
+  const [searchParams] = useSearchParams();
+  const paramsKey = searchParams.toString();
   const [markets, setMarkets] = useState([]);
-  const [crop, setCrop] = useState('groundnut');
+  const [crop, setCrop] = useState(() => {
+    const value = searchParams.get('crop');
+    return value && CROP_LABELS[value] ? value : 'groundnut';
+  });
   const [compare, setCompare] = useState(null);
-  const [selectedMarket, setSelectedMarket] = useState('farafenni');
+  const [selectedMarket, setSelectedMarket] = useState(() => searchParams.get('market') || 'farafenni');
+  const [marketLocked, setMarketLocked] = useState(() => Boolean(searchParams.get('market')));
   const [history, setHistory] = useState([]);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    const params = new URLSearchParams(paramsKey);
+    const nextCrop = params.get('crop');
+    const nextMarket = params.get('market');
+    if (nextCrop && CROP_LABELS[nextCrop]) setCrop(nextCrop);
+    if (nextMarket) {
+      setSelectedMarket(nextMarket);
+      setMarketLocked(true);
+    } else {
+      setMarketLocked(false);
+    }
+  }, [paramsKey]);
 
   useEffect(() => {
     let active = true;
@@ -39,7 +59,7 @@ export default function Markets() {
       .then((res) => {
         if (!active) return;
         setCompare(res.data);
-        if (res.data?.bestMarket?.id) setSelectedMarket(res.data.bestMarket.id);
+        if (res.data?.bestMarket?.id && !marketLocked) setSelectedMarket(res.data.bestMarket.id);
       })
       .catch(() => {
         if (active) setError('Could not load market prices.');
@@ -47,7 +67,7 @@ export default function Markets() {
     return () => {
       active = false;
     };
-  }, [crop, backendRecovery]);
+  }, [crop, backendRecovery, marketLocked]);
 
   useEffect(() => {
     let active = true;
@@ -77,7 +97,10 @@ export default function Markets() {
             key={c}
             type="button"
             className={`chip ${crop === c ? 'chip--active' : ''}`}
-            onClick={() => setCrop(c)}
+            onClick={() => {
+              setCrop(c);
+              setMarketLocked(false);
+            }}
           >
             {formatCrop(c)}
           </button>

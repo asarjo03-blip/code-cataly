@@ -1,5 +1,6 @@
 import { Outlet, useLocation } from 'react-router-dom';
 import BottomNav from './BottomNav.jsx';
+import VoiceAssistant from './VoiceAssistant.jsx';
 import './Layout.css';
 
 export default function Layout() {
@@ -23,6 +24,7 @@ export default function Layout() {
         <Outlet />
       </main>
       {!hideNav ? <BottomNav /> : null}
+      {!isAuth ? <VoiceAssistant raised={!hideChrome} /> : null}
     </div>
   );
 }

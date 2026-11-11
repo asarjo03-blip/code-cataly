@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import TopBar from '../components/TopBar.jsx';
 import { buyRequestApi } from '../api/services.js';
 import { getErrorMessage } from '../api/client.js';
@@ -21,6 +22,16 @@ export default function BuyRequests() {
   const { t } = useLanguage();
   const backendRecovery = useBackendRecovery();
   const { user, isBuyer } = useAuth();
+  const [searchParams] = useSearchParams();
+  const paramsKey = searchParams.toString();
+  const [cropFilter, setCropFilter] = useState(() => {
+    const value = searchParams.get('crop');
+    return value && CROP_LABELS[value] ? value : 'all';
+  });
+  const [regionFilter, setRegionFilter] = useState(() => {
+    const value = searchParams.get('region');
+    return value && REGION_LABELS[value] ? value : 'all';
+  });
   const [tick, setTick] = useState(0);
   const [requests, setRequests] = useState([]);
   const [error, setError] = useState('');
@@ -35,6 +46,23 @@ export default function BuyRequests() {
     neededBy: new Date().toISOString().slice(0, 10),
     notes: '',
   });
+
+  useEffect(() => {
+    const params = new URLSearchParams(paramsKey);
+    const value = params.get('crop');
+    const nextRegion = params.get('region');
+    setCropFilter(value && CROP_LABELS[value] ? value : 'all');
+    setRegionFilter(nextRegion && REGION_LABELS[nextRegion] ? nextRegion : 'all');
+    if (value && CROP_LABELS[value]) {
+      setForm((prev) => ({ ...prev, crop: value }));
+    }
+  }, [paramsKey]);
+
+  const visibleRequests = requests.filter(
+    (request) =>
+      (cropFilter === 'all' || request.crop === cropFilter) &&
+      (regionFilter === 'all' || request.region === regionFilter),
+  );
 
   useEffect(() => {
     let active = true;
@@ -136,8 +164,51 @@ export default function BuyRequests() {
         </form>
       ) : null}
 
+      <div className="section-head">
+        <h2>Open buy requests</h2>
+      </div>
+      <div className="chip-row" role="group" aria-label="Filter buy requests by crop">
+        <button
+          type="button"
+          className={`chip ${cropFilter === 'all' ? 'chip--active' : ''}`}
+          onClick={() => setCropFilter('all')}
+        >
+          All crops
+        </button>
+        {Object.entries(CROP_LABELS).map(([value, label]) => (
+          <button
+            key={value}
+            type="button"
+            className={`chip ${cropFilter === value ? 'chip--active' : ''}`}
+            onClick={() => setCropFilter(value)}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      <div className="chip-row" role="group" aria-label="Filter buy requests by region">
+        <button
+          type="button"
+          className={`chip ${regionFilter === 'all' ? 'chip--active' : ''}`}
+          onClick={() => setRegionFilter('all')}
+        >
+          All regions
+        </button>
+        {Object.entries(REGION_LABELS).map(([value, label]) => (
+          <button
+            key={value}
+            type="button"
+            className={`chip ${regionFilter === value ? 'chip--active' : ''}`}
+            onClick={() => setRegionFilter(value)}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
       <div className="list-stack">
-        {requests.map((req) => (
+        {visibleRequests.map((req) => (
           <article key={req.id} className="list-item">
             <div>
               <h3>
@@ -158,6 +229,7 @@ export default function BuyRequests() {
             </div>
           </article>
         ))}
+        {!visibleRequests.length ? <p className="page-subtitle">{t('noResults')}</p> : null}
       </div>
     </div>
   );
