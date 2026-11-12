@@ -2,9 +2,10 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import AlertBanner from '../components/AlertBanner.jsx';
 import Loader, { Skeleton } from '../components/Loader.jsx';
+import ProduceCard from '../components/ProduceCard.jsx';
 import { weatherIconFor } from '../components/Icons.jsx';
 import TopBar from '../components/TopBar.jsx';
-import { dashboardApi } from '../api/services.js';
+import { dashboardApi, listingApi } from '../api/services.js';
 import { getErrorMessage } from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
@@ -19,6 +20,7 @@ export default function Dashboard() {
   const [data, setData] = useState(null);
   const [prices, setPrices] = useState([]);
   const [matches, setMatches] = useState([]);
+  const [produce, setProduce] = useState([]);
   const [managedAlerts, setManagedAlerts] = useState([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
@@ -28,11 +30,15 @@ export default function Dashboard() {
     async function load() {
       setLoading(true);
       try {
-        const dash = await dashboardApi.get(user);
+        const [dash, produceResponse] = await Promise.all([
+          dashboardApi.get(user),
+          listingApi.list({ category: 'crop', limit: 12 }).catch(() => ({ data: [] })),
+        ]);
         if (!active) return;
         setData(dash.data);
         setPrices(dash.data?.prices || []);
         setMatches(dash.data?.matches || []);
+        setProduce(produceResponse?.data || []);
         setManagedAlerts(dash.data?.alerts || []);
       } catch (err) {
         if (active) setError(getErrorMessage(err, 'Could not load dashboard'));
@@ -111,6 +117,22 @@ export default function Dashboard() {
                 <span>{day.label || day.day || `D${index + 1}`}</span>
                 <strong>{Math.round(day.tempC ?? day.maxTempC ?? day.temp ?? 0)}°</strong>
               </div>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
+      {!loading && produce.length ? (
+        <section>
+          <div className="section-head">
+            <h2>{t('freshProduce')}</h2>
+            <Link to="/marketplace" className="section-link">
+              {t('seeAll')}
+            </Link>
+          </div>
+          <div className="dash-produce">
+            {produce.slice(0, 8).map((listing) => (
+              <ProduceCard key={listing.id} listing={listing} />
             ))}
           </div>
         </section>
