@@ -1312,6 +1312,10 @@ export function assistantSuggestions(language = 'en', user = null) {
     .slice(0, 8)
     .map((suggestion) => ({
       query: suggestion.query,
-      label: suggestion.labels[language] || suggestion.labels.en,
+      label:
+        suggestion.labels?.[language] ||
+        suggestion.labels?.en ||
+        suggestion.label ||
+        suggestion.query,
     }));
 }
