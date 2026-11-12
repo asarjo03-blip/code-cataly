@@ -83,7 +83,6 @@ export default function Marketplace() {
         <img
           src="/images/serrekunda-market-chilli.jpg"
           alt="Fresh chilli peppers for sale at Serrekunda Market in The Gambia"
-          fetchPriority="high"
         />
         <figcaption>
           Serrekunda Market, The Gambia · Photo by{' '}

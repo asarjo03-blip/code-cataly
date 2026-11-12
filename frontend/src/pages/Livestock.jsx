@@ -6,6 +6,7 @@ import { getErrorMessage } from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useBackendRecovery } from '../hooks/useBackendRecovery.js';
 import { REGION_LABELS, formatDate, formatGmd, formatRegion, telLink, whatsappLink } from '../utils/format.js';
+import { getLivestockPhoto } from '../data/livestockPhotos.js';
 import './Livestock.css';
 
 const ANIMALS = [
@@ -221,6 +222,28 @@ export default function Livestock() {
     <div className="livestock-page">
       <TopBar title="Livestock & poultry" subtitle="Buy and sell animals, find markets and get animal-health guidance" />
 
+      <section className="livestock-section" aria-labelledby="livestock-animals-title">
+        <div className="section-head"><h2 id="livestock-animals-title">Animals on AgriConnect</h2></div>
+        <div className="livestock-animal-grid">
+          {ANIMALS.map((item) => {
+            const photo = getLivestockPhoto(item.id);
+            return (
+              <figure className="livestock-animal-card" key={item.id}>
+                {photo ? <img src={photo.src} alt={photo.alt} loading="lazy" /> : null}
+                <figcaption>
+                  <strong>{item.label}</strong>
+                  {photo ? (
+                    <a href={photo.source} target="_blank" rel="noreferrer">
+                      Photo: {photo.artist} · {photo.license}
+                    </a>
+                  ) : null}
+                </figcaption>
+              </figure>
+            );
+          })}
+        </div>
+      </section>
+
       {message ? <p className="form-page__toast">{message}</p> : null}
       {error ? <p className="field-error" role="alert">{error}</p> : null}
 
@@ -308,8 +331,15 @@ export default function Livestock() {
           {loading ? <p className="page-subtitle">Loading livestock offers…</p> : null}
           {!loading && !visibleListings.length ? <p className="page-subtitle">No livestock sale listings yet.</p> : null}
           <div className="livestock-market-list">
-            {visibleListings.map((listing) => (
+            {visibleListings.map((listing) => {
+              const photo = getLivestockPhoto(listing.crop);
+              return (
               <article className="livestock-market-card" key={listing.id}>
+                {photo ? (
+                  <figure className="livestock-market-card__media">
+                    <img src={photo.src} alt={photo.alt} loading="lazy" />
+                  </figure>
+                ) : null}
                 <div>
                   <h3>{ANIMAL_LABELS[listing.crop] || listing.crop} · {listing.quantity} head</h3>
                   <p>{formatGmd(listing.askingPrice, 'head')} each · {listing.village || formatRegion(listing.region)}</p>
@@ -322,8 +352,14 @@ export default function Livestock() {
                     <a href={whatsappLink(listing.farmerPhone, `Hello, I am interested in your ${ANIMAL_LABELS[listing.crop] || listing.crop} listing on AgriConnect.`)} target="_blank" rel="noreferrer">WhatsApp</a>
                   </div>
                 ) : <p className="livestock-market-card__contact">Contact details unavailable</p>}
+                {photo ? (
+                  <a className="livestock-market-card__credit" href={photo.source} target="_blank" rel="noreferrer">
+                    Photo: {photo.artist} · {photo.license}
+                  </a>
+                ) : null}
               </article>
-            ))}
+              );
+            })}
           </div>
         </section>
       ) : (
@@ -345,8 +381,15 @@ export default function Livestock() {
           {loading ? <p className="page-subtitle">Loading livestock requests…</p> : null}
           {!loading && !visibleRequests.length ? <p className="page-subtitle">No livestock buy requests yet.</p> : null}
           <div className="livestock-market-list">
-            {visibleRequests.map((request) => (
+            {visibleRequests.map((request) => {
+              const photo = getLivestockPhoto(request.crop);
+              return (
               <article className="livestock-market-card" key={request.id}>
+                {photo ? (
+                  <figure className="livestock-market-card__media">
+                    <img src={photo.src} alt={photo.alt} loading="lazy" />
+                  </figure>
+                ) : null}
                 <div>
                   <h3>{ANIMAL_LABELS[request.crop] || request.crop} · {request.quantity} head wanted</h3>
                   <p>{formatGmd(request.offerPrice, 'head')} offered each · {formatRegion(request.region)}</p>
@@ -359,8 +402,14 @@ export default function Livestock() {
                     <a href={whatsappLink(request.buyerPhone, `Hello, I can supply ${ANIMAL_LABELS[request.crop] || request.crop} via AgriConnect.`)} target="_blank" rel="noreferrer">WhatsApp</a>
                   </div>
                 ) : <p className="livestock-market-card__contact">Contact details unavailable</p>}
+                {photo ? (
+                  <a className="livestock-market-card__credit" href={photo.source} target="_blank" rel="noreferrer">
+                    Photo: {photo.artist} · {photo.license}
+                  </a>
+                ) : null}
               </article>
-            ))}
+              );
+            })}
           </div>
         </section>
       )}

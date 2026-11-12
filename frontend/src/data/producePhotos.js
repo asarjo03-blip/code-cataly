@@ -126,6 +126,42 @@ export const PRODUCE_PHOTOS = {
     license: 'CC BY-SA 3.0',
     source: 'https://commons.wikimedia.org/wiki/File:Cyperus_esculentus_-Chufas.JPG',
   },
+  maize: {
+    src: '/images/fresh-maize.jpg',
+    alt: 'Fresh maize cobs from a farm in Ghana',
+    artist: 'Pascal Kings',
+    license: 'CC BY-SA 4.0',
+    source: 'https://commons.wikimedia.org/wiki/File:Maize_in_Ghana.jpg',
+  },
+  sorghum: {
+    src: '/images/fresh-sorghum.jpg',
+    alt: 'Sorghum grain on sale at a market in Kaduna, Nigeria',
+    artist: 'Kambai Akau',
+    license: 'CC BY-SA 4.0',
+    source:
+      'https://commons.wikimedia.org/wiki/File:Sorghum_on_sale_at_the_Monday_Market_in_Kakuri,_Kaduna,_Nigeria.jpg',
+  },
+  cassava: {
+    src: '/images/fresh-cassava.jpg',
+    alt: 'Freshly harvested cassava roots',
+    artist: 'Denis kasozi',
+    license: 'CC BY-SA 4.0',
+    source: 'https://commons.wikimedia.org/wiki/File:Harvested_cassava_roots_06.jpg',
+  },
+  cabbage: {
+    src: '/images/fresh-cabbage.jpg',
+    alt: 'A mature green cabbage head',
+    artist: 'Dinesh Valke',
+    license: 'CC BY-SA 2.0',
+    source: 'https://commons.wikimedia.org/wiki/File:Brassica_oleracea_var._capitata_(4170722993).jpg',
+  },
+  cashew: {
+    src: '/images/fresh-cashew.jpg',
+    alt: 'Raw cashew nuts in their shells',
+    artist: 'Omar hoftun',
+    license: 'CC BY-SA 4.0',
+    source: 'https://commons.wikimedia.org/wiki/File:Anacardium_occidentale_seeds,_by_Omar_Hoftun.jpg',
+  },
 };
 
 export function getProducePhoto(crop) {

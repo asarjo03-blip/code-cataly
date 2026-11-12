@@ -142,6 +142,12 @@ const demoListings = [
   { seedKey: 'demo-cashew-brikama', crop: 'cashew', quantity: 200, askingPrice: 54, region: REGIONS.WEST_COAST, village: 'Brikama', notes: 'Raw nuts, orchard collection.', seller: 'brikama.coop@agriconnect.gm' },
   { seedKey: 'demo-okra-soma', crop: 'okra', quantity: 75, askingPrice: 32, region: REGIONS.LOWER_RIVER, village: 'Soma', notes: 'Fresh okra for market day.', seller: 'farmer@agriconnect.gm' },
   { seedKey: 'demo-pepper-farafenni', crop: 'pepper', quantity: 65, askingPrice: 42, region: REGIONS.NORTH_BANK, village: 'Farafenni', notes: 'Dried and fresh chilli available.', seller: 'farmer@agriconnect.gm' },
+  { seedKey: 'demo-broiler-chickens-brikama', category: 'livestock', crop: 'broiler_chicken', quantity: 40, askingPrice: 350, unit: 'head', region: REGIONS.WEST_COAST, village: 'Brikama', notes: 'Six-week-old broilers, vaccinated and ready for market.', seller: 'brikama.coop@agriconnect.gm' },
+  { seedKey: 'demo-layer-hens-kerewan', category: 'livestock', crop: 'layer_chicken', quantity: 60, askingPrice: 300, unit: 'head', region: REGIONS.NORTH_BANK, village: 'Kerewan', notes: 'Point-of-lay hens, healthy and vaccinated.', seller: 'northbank.women@agriconnect.gm' },
+  { seedKey: 'demo-sheep-basse', category: 'livestock', crop: 'sheep', quantity: 12, askingPrice: 3500, unit: 'head', region: REGIONS.UPPER_RIVER, village: 'Basse', notes: 'Young rams and ewes grazed on natural pasture.', seller: 'urr.union@agriconnect.gm' },
+  { seedKey: 'demo-goats-kerewan', category: 'livestock', crop: 'goat', quantity: 18, askingPrice: 2500, unit: 'head', region: REGIONS.NORTH_BANK, village: 'Kerewan', notes: 'West African Dwarf goats, mostly does.', seller: 'northbank.women@agriconnect.gm' },
+  { seedKey: 'demo-cattle-brikama', category: 'livestock', crop: 'cattle', quantity: 6, askingPrice: 18000, unit: 'head', region: REGIONS.WEST_COAST, village: 'Brikama', notes: 'Young local-breed bulls in good condition.', seller: 'brikama.coop@agriconnect.gm' },
+  { seedKey: 'demo-ducks-soma', category: 'livestock', crop: 'duck', quantity: 25, askingPrice: 400, unit: 'head', region: REGIONS.LOWER_RIVER, village: 'Soma', notes: 'Farm-raised Muscovy ducks, healthy flock.', seller: 'farmer@agriconnect.gm' },
 ];
 
 const demoBuyRequests = [
@@ -165,6 +171,12 @@ const demoBuyRequests = [
   { seedKey: 'demo-cucumber-request', crop: 'cucumber', quantity: 120, offerPrice: 30, region: REGIONS.KANIFING, notes: 'Hotel kitchens, straight fruit.', buyer: 'kanifing.fresh@agriconnect.gm' },
   { seedKey: 'demo-moringa-request', crop: 'moringa', quantity: 80, offerPrice: 65, region: REGIONS.NORTH_BANK, notes: 'Natural foods cooperative, fresh leaves.', buyer: 'vendor@agriconnect.gm' },
   { seedKey: 'demo-tiger-nut-request', crop: 'tiger_nut', quantity: 220, offerPrice: 50, region: REGIONS.LOWER_RIVER, notes: 'Drink producer, washed tubers.', buyer: 'oilseed.export@agriconnect.gm' },
+  { seedKey: 'demo-broiler-request', category: 'livestock', crop: 'broiler_chicken', quantity: 30, offerPrice: 360, unit: 'head', region: REGIONS.KANIFING, notes: 'Hotel kitchen weekly poultry order.', buyer: 'vendor@agriconnect.gm' },
+  { seedKey: 'demo-layer-request', category: 'livestock', crop: 'layer_chicken', quantity: 40, offerPrice: 310, unit: 'head', region: REGIONS.NORTH_BANK, notes: 'Egg producer expanding the laying flock.', buyer: 'kanifing.fresh@agriconnect.gm' },
+  { seedKey: 'demo-sheep-request', category: 'livestock', crop: 'sheep', quantity: 8, offerPrice: 3600, unit: 'head', region: REGIONS.WEST_COAST, notes: 'Healthy rams wanted for the Tobaski market.', buyer: 'vendor@agriconnect.gm' },
+  { seedKey: 'demo-goat-request', category: 'livestock', crop: 'goat', quantity: 10, offerPrice: 2600, unit: 'head', region: REGIONS.CENTRAL_RIVER_SOUTH, notes: 'Buying for the seasonal livestock market.', buyer: 'vendor@agriconnect.gm' },
+  { seedKey: 'demo-cattle-request', category: 'livestock', crop: 'cattle', quantity: 4, offerPrice: 19000, unit: 'head', region: REGIONS.UPPER_RIVER, notes: 'Butcher buying finished bulls.', buyer: 'vendor@agriconnect.gm' },
+  { seedKey: 'demo-duck-request', category: 'livestock', crop: 'duck', quantity: 20, offerPrice: 420, unit: 'head', region: REGIONS.LOWER_RIVER, notes: 'Restaurant supplier, farm-raised ducks only.', buyer: 'kanifing.fresh@agriconnect.gm' },
 ];
 
 const demoMarkets = [
