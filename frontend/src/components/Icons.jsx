@@ -168,6 +168,55 @@ export const WeatherCloudIcon = (props) => (
   </Svg>
 );
 
+export const WeatherNightIcon = (props) => (
+  <Svg {...props}>
+    <path d="M19.5 14.5A7.5 7.5 0 0 1 9.5 4.5a7.5 7.5 0 1 0 10 10z" fill="#e8f4fb" stroke="#fff" strokeWidth="1"/>
+    <path d="M17.5 4.5v1.6M20.9 8h-1.6M18.9 6.3l-1.1-1.1" stroke="#fff" strokeWidth="1.4" strokeLinecap="round"/>
+  </Svg>
+);
+
+export const DropletIcon = (props) => (
+  <Svg {...props}>
+    <path d="M12 3.5s5.5 6.1 5.5 10a5.5 5.5 0 1 1-11 0c0-3.9 5.5-10 5.5-10z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round"/>
+  </Svg>
+);
+
+export const WindIcon = (props) => (
+  <Svg {...props}>
+    <path d="M3 9h11a3 3 0 1 0-3-3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+    <path d="M3 13h14a3 3 0 1 1-3 3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+    <path d="M3 17h5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+  </Svg>
+);
+
+export const UmbrellaIcon = (props) => (
+  <Svg {...props}>
+    <path d="M3 12a9 9 0 0 1 18 0H3z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round"/>
+    <path d="M12 12v6a2 2 0 0 0 4 0" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+  </Svg>
+);
+
+export const UvIcon = (props) => (
+  <Svg {...props}>
+    <circle cx="12" cy="12" r="3.6" stroke="currentColor" strokeWidth="1.8"/>
+    <path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6 7 7M17 17l1.4 1.4M5.6 18.4 7 17M17 7l1.4-1.4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
+  </Svg>
+);
+
+export const SunriseIcon = (props) => (
+  <Svg {...props}>
+    <path d="M4 18h16M7 18a5 5 0 0 1 10 0" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+    <path d="M12 3v4M4.5 9 6 10.5M19.5 9 18 10.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
+  </Svg>
+);
+
+export const SunsetIcon = (props) => (
+  <Svg {...props}>
+    <path d="M4 18h16M7 18a5 5 0 0 1 10 0" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+    <path d="M12 11V7M4.5 13 6 11.5M19.5 13 18 11.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
+  </Svg>
+);
+
 export const AlertWeatherIcon = (props) => (
   <Svg {...props}>
     <path d="M4 16h16l-2-6H6L4 16z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round"/>
@@ -229,8 +278,9 @@ export const VolumeOffIcon = (props) => (
   </Svg>
 );
 
-export function weatherIconFor(code, rainMm = 0) {
+export function weatherIconFor(code, rainMm = 0, isDay = true) {
   if (rainMm >= 2 || [51, 53, 55, 61, 63, 65, 80, 81, 95, 96].includes(code)) return WeatherRainIcon;
+  if (!isDay && [0, 1].includes(code)) return WeatherNightIcon;
   if ([2, 3, 45, 48].includes(code)) return WeatherCloudIcon;
   return WeatherSunIcon;
 }

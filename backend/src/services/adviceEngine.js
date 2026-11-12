@@ -13,7 +13,7 @@ function cropAdvice(crop, context) {
   const items = [];
   const { season, phase } = context.season;
   const rain = context.weather?.current?.rainMm || 0;
-  const temp = context.weather?.current?.tempC || 0;
+  const temp = context.weather?.current?.highTempC ?? context.weather?.current?.tempC ?? 0;
   const dryDays = (context.weather?.forecast || []).filter((day) => (day.rainMm || 0) < 1).length;
   const harvestRainDays = (context.weather?.forecast || []).filter((day) => (day.rainMm || 0) >= ADVICE_THRESHOLDS.heavyRainMm).length;
 

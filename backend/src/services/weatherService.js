@@ -38,6 +38,20 @@ const CLIMATOLOGY = {
   },
 };
 
+const COMPASS_POINTS = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+
+function compassFromDegrees(degrees) {
+  const value = Number(degrees);
+  if (degrees === null || degrees === undefined || Number.isNaN(value)) return null;
+  return COMPASS_POINTS[Math.round((((value % 360) + 360) % 360) / 45) % 8];
+}
+
+function clockTime(value) {
+  if (!value) return null;
+  const time = String(value).split('T')[1];
+  return time ? time.slice(0, 5) : null;
+}
+
 function cacheKey(lat, lon) {
   return `${lat.toFixed(2)},${lon.toFixed(2)}`;
 }
@@ -80,36 +94,58 @@ export function resolveLocation({ region, lat, lon }) {
 function climatologySnapshot(location) {
   const phase = getSeasonPhase();
   const sample = CLIMATOLOGY[phase.season][phase.phase];
+  const windDirDeg = phase.season === 'rainy' ? 225 : 60;
+  const current = {
+    tempC: sample.tempC,
+    feelsLikeC: sample.tempC + (sample.humidity >= 70 ? 4 : 1),
+    humidity: sample.humidity,
+    rainMm: sample.rainMm,
+    rainChance: sample.rainMm > 0 ? Math.min(95, 40 + sample.rainMm * 3) : 8,
+    windKph: sample.windKph,
+    windDirDeg,
+    windDir: compassFromDegrees(windDirDeg),
+    isDay: true,
+    uvIndex: phase.season === 'rainy' ? 6 : 8,
+    highTempC: sample.tempC + 4,
+    lowTempC: sample.tempC - 6,
+    sunrise: '07:00',
+    sunset: '18:30',
+    condition: sample.condition,
+    code: sample.code,
+  };
+
   return {
     source: 'gambia-climatology',
     location,
-    current: {
-      tempC: sample.tempC,
-      humidity: sample.humidity,
-      rainMm: sample.rainMm,
-      rainChance: sample.rainMm > 0 ? Math.min(95, 40 + sample.rainMm * 3) : 8,
-      windKph: sample.windKph,
-      condition: sample.condition,
-      code: sample.code,
-    },
-    forecast: Array.from({ length: 5 }, (_item, index) => ({
-      dayOffset: index + 1,
-      date: new Date(Date.now() + (index + 1) * 86400000).toISOString().slice(0, 10),
-      label: new Date(Date.now() + (index + 1) * 86400000).toLocaleDateString('en-GB', { weekday: 'short' }),
-      tempC: sample.tempC + ((index % 2) - 0.5),
-      maxTempC: sample.tempC + 1,
-      rainMm: sample.rainMm,
-      condition: sample.condition,
-      code: sample.code,
-    })),
+    updatedAt: new Date().toISOString(),
+    current,
+    forecast: Array.from({ length: 5 }, (_item, index) => {
+      const date = new Date(Date.now() + (index + 1) * 86400000);
+      const maxTempC = sample.tempC + 1 + (index % 2);
+      return {
+        dayOffset: index + 1,
+        date: date.toISOString().slice(0, 10),
+        label: date.toLocaleDateString('en-GB', { weekday: 'short' }),
+        tempC: maxTempC,
+        maxTempC,
+        minTempC: maxTempC - 8,
+        rainMm: sample.rainMm,
+        rainChance: current.rainChance,
+        windKph: sample.windKph,
+        uvIndexMax: current.uvIndex,
+        condition: sample.condition,
+        code: sample.code,
+      };
+    }),
     season: phase,
-    alerts: buildWeatherAlerts(sample, phase),
+    alerts: buildWeatherAlerts(current, phase),
   };
 }
 
 function buildWeatherAlerts(current, phase) {
   const alerts = [];
-  if (current.tempC >= 33) {
+  const heatTemp = current.highTempC ?? current.tempC;
+  if (heatTemp >= 33) {
     alerts.push({
       severity: 'warning',
       code: 'heat',
@@ -148,8 +184,10 @@ async function fetchOpenMeteo(location) {
   const query = new URLSearchParams({
     latitude: String(location.lat),
     longitude: String(location.lon),
-    current: 'temperature_2m,relative_humidity_2m,precipitation,weather_code,wind_speed_10m',
-    daily: 'weather_code,temperature_2m_max,precipitation_sum,precipitation_probability_max',
+    current:
+      'temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m,wind_direction_10m,is_day',
+    daily:
+      'weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,wind_speed_10m_max,uv_index_max,sunrise,sunset',
     forecast_days: '6',
     timezone: 'Africa/Banjul',
   });
@@ -159,26 +197,42 @@ async function fetchOpenMeteo(location) {
   const json = await response.json();
   const phase = getSeasonPhase();
   const currentCode = json.current?.weather_code;
+  const windDirDeg = json.current?.wind_direction_10m;
   const current = {
     tempC: json.current?.temperature_2m,
+    feelsLikeC: json.current?.apparent_temperature,
     humidity: json.current?.relative_humidity_2m,
     rainMm: json.current?.precipitation || 0,
     rainChance: json.daily?.precipitation_probability_max?.[0] ?? (json.current?.precipitation > 0 ? 60 : 10),
     windKph: json.current?.wind_speed_10m || 0,
+    windDirDeg,
+    windDir: compassFromDegrees(windDirDeg),
+    isDay: Boolean(json.current?.is_day),
+    uvIndex: json.daily?.uv_index_max?.[0] ?? null,
+    highTempC: json.daily?.temperature_2m_max?.[0] ?? null,
+    lowTempC: json.daily?.temperature_2m_min?.[0] ?? null,
+    sunrise: clockTime(json.daily?.sunrise?.[0]),
+    sunset: clockTime(json.daily?.sunset?.[0]),
     condition: describeCode(currentCode),
     code: currentCode,
   };
 
   const forecast = (json.daily?.time || []).slice(1, 6).map((date, index) => {
     const code = json.daily.weather_code?.[index + 1];
+    const maxTempC = json.daily.temperature_2m_max?.[index + 1];
     return {
       dayOffset: index + 1,
       date,
       label: new Date(`${date}T12:00:00`).toLocaleDateString('en-GB', { weekday: 'short' }),
-      tempC: json.daily.temperature_2m_max?.[index + 1],
-      maxTempC: json.daily.temperature_2m_max?.[index + 1],
+      tempC: maxTempC,
+      maxTempC,
+      minTempC: json.daily.temperature_2m_min?.[index + 1] ?? null,
       rainMm: json.daily.precipitation_sum?.[index + 1] || 0,
       rainChance: json.daily.precipitation_probability_max?.[index + 1] ?? 0,
+      windKph: json.daily.wind_speed_10m_max?.[index + 1] ?? null,
+      uvIndexMax: json.daily.uv_index_max?.[index + 1] ?? null,
+      sunrise: clockTime(json.daily.sunrise?.[index + 1]),
+      sunset: clockTime(json.daily.sunset?.[index + 1]),
       condition: describeCode(code),
       code,
     };
@@ -187,6 +241,7 @@ async function fetchOpenMeteo(location) {
   return {
     source: 'open-meteo',
     location,
+    updatedAt: new Date().toISOString(),
     current,
     forecast,
     season: phase,

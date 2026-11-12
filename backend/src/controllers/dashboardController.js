@@ -88,6 +88,8 @@ export const getDashboard = asyncHandler(async (request, response) => {
       season: weather.season,
       weather: {
         source: weather.source,
+        updatedAt: weather.updatedAt,
+        cached: weather.cached,
         current: weather.current,
         forecast: weather.forecast,
         alerts: weather.alerts,

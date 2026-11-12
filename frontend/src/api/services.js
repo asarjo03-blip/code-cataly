@@ -72,26 +72,54 @@ function getDemoAdvisories({ crop, category, q } = {}) {
 function getDemoWeather(region) {
   const today = new Date();
   const isRainySeason = today.getMonth() >= 5 && today.getMonth() <= 9;
+  const tempC = isRainySeason ? 29 : 33;
+  const humidity = isRainySeason ? 78 : 42;
+  const windKph = isRainySeason ? 14 : 12;
+  const rainChance = isRainySeason ? 45 : 5;
+  const condition = isRainySeason ? 'Partly cloudy' : 'Sunny';
+  const code = isRainySeason ? 2 : 0;
   return {
     source: 'demo',
     location: { region },
+    updatedAt: new Date().toISOString(),
     season: {
       season: isRainySeason ? 'rainy' : 'dry',
       phase: isRainySeason ? 'late' : 'dry',
     },
     current: {
-      tempC: isRainySeason ? 29 : 33,
+      tempC,
+      feelsLikeC: tempC + (humidity >= 70 ? 4 : 1),
+      humidity,
       rainMm: 0,
-      condition: isRainySeason ? 'Partly cloudy' : 'Sunny',
+      rainChance,
+      windKph,
+      windDirDeg: isRainySeason ? 225 : 60,
+      windDir: isRainySeason ? 'SW' : 'NE',
+      isDay: true,
+      uvIndex: isRainySeason ? 6 : 8,
+      highTempC: tempC + 5,
+      lowTempC: tempC - 7,
+      sunrise: '07:00',
+      sunset: '18:30',
+      condition,
+      code,
     },
     forecast: Array.from({ length: 5 }, (_, index) => {
       const date = new Date(today);
       date.setDate(today.getDate() + index + 1);
+      const maxTempC = tempC + 3 + (index % 2);
       return {
         date: date.toISOString().slice(0, 10),
         label: date.toLocaleDateString(undefined, { weekday: 'short' }),
-        tempC: (isRainySeason ? 29 : 33) + (index % 2),
+        tempC: maxTempC,
+        maxTempC,
+        minTempC: maxTempC - 8,
         rainMm: isRainySeason && index === 2 ? 4 : 0,
+        rainChance: isRainySeason ? Math.min(80, 30 + index * 8) : 5,
+        windKph,
+        uvIndexMax: isRainySeason ? 6 : 8,
+        condition,
+        code,
       };
     }),
     alerts: [],

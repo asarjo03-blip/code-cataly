@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import AlertBanner from '../components/AlertBanner.jsx';
 import Loader, { Skeleton } from '../components/Loader.jsx';
 import ProduceCard from '../components/ProduceCard.jsx';
-import { weatherIconFor } from '../components/Icons.jsx';
+import WeatherCard from '../components/WeatherCard.jsx';
 import TopBar from '../components/TopBar.jsx';
 import { dashboardApi, listingApi } from '../api/services.js';
 import { getErrorMessage } from '../api/client.js';
@@ -52,8 +52,7 @@ export default function Dashboard() {
     };
   }, [user, backendRecovery]);
 
-  const weather = data?.weather?.current;
-  const forecast = data?.weather?.forecast || [];
+  const weather = data?.weather;
   const alerts = [
     ...managedAlerts,
     ...(data?.weather?.alerts || []).map((a) => ({
@@ -93,33 +92,8 @@ export default function Dashboard() {
 
       {error ? <p className="field-error">{error}</p> : null}
 
-      {!loading && weather ? (
-        <section className="dash-weather fade-in">
-          <div className="dash-weather__now">
-            <div>
-              <p className="dash-weather__label">{t('weather')}</p>
-              <p className="dash-weather__temp">{Math.round(weather.tempC)}°C</p>
-              <p className="dash-weather__meta">
-                Rain {weather.rainMm ?? weather.rainChance ?? 0}
-                {weather.rainMm != null ? ' mm' : '%'} · {weather.condition || weather.description || '—'}
-              </p>
-            </div>
-            <span className="dash-weather__icon" aria-hidden="true">
-              {(() => {
-                const Icon = weatherIconFor(weather.code, weather.rainMm);
-                return <Icon size={48} />;
-              })()}
-            </span>
-          </div>
-          <div className="dash-weather__forecast">
-            {forecast.slice(0, 5).map((day, index) => (
-              <div key={day.date || index} className="dash-weather__day">
-                <span>{day.label || day.day || `D${index + 1}`}</span>
-                <strong>{Math.round(day.tempC ?? day.maxTempC ?? day.temp ?? 0)}°</strong>
-              </div>
-            ))}
-          </div>
-        </section>
+      {!loading && weather?.current ? (
+        <WeatherCard weather={weather} season={data?.season || weather?.season} />
       ) : null}
 
       {!loading && produce.length ? (
